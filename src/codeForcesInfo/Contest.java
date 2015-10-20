@@ -1,14 +1,28 @@
 package codeForcesInfo;
 
 /*
- * Clase que modela la estructura de datos que retorna la funcion 
- * contest.list.
+ * Clase que modela la estructura de datos Contest.
  */
 public class Contest {
+	
+	public enum type{
+	CF,
+	IOI,
+	ICPC
+	}
+	
+	public enum phase{
+		BEFORE,
+		CODING,
+		PENDING_SYSTEM_TEST,
+		SYSTEM_TEST,
+		FINISHED
+	}
+	
 	private int ID;
 	private String name;
-	private String type;
-	private String phase;
+	private type type;
+	private phase phase;
 	private boolean frozen;
 	private int durationSeconds;
 	private String description;
@@ -30,16 +44,16 @@ public class Contest {
 	public void setName(String name) {
 		this.name = name;
 	}
-	public String getType() {
+	public type getType() {
 		return type;
 	}
-	public void setType(String type) {
+	public void setType(type type) {
 		this.type = type;
 	}
-	public String getPhase() {
+	public phase getPhase() {
 		return phase;
 	}
-	public void setPhase(String phase) {
+	public void setPhase(phase phase) {
 		this.phase = phase;
 	}
 	public boolean isFrozen() {
