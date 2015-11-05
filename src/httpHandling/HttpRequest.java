@@ -21,37 +21,31 @@ public class HttpRequest {
 	public HttpRequest(String address){
 		this.address = address;
 		
-		try {
-			this.url = new URL(protocol, address, port, method + query);
-			this.connection = (HttpsURLConnection) url.openConnection();
-			
-			inputStream = new BufferedInputStream(connection.getInputStream());
-			inputStream.mark(0);
-		} catch (MalformedURLException ex) {
-			Logger.getLogger(HttpRequest.class.getName()).log(Level.SEVERE, null, ex);
-		} catch (IOException ex){
-			Logger.getLogger(HttpRequest.class.getName()).log(Level.SEVERE, null, ex);
-		}
+		if(address == null)	
+			this.address = "localhost";
+		else if(address.isEmpty())	
+			this.address = "localhost";
+		else if(address.startsWith("http[s]?://"))
+			this.address = address.replaceFirst("http[s]?://", "");
 	}
 	
     public HttpRequest(String address, String query){
 		this.address = address;
 		this.query = query;
 		
-		if(query.charAt(0) != '?')
-			query = "?" + query;
+		if(address == null)	
+			this.address = "localhost";
+		else if(address.isEmpty())	
+			this.address = "localhost";
+		else if(address.startsWith("http[s]?://"))
+			this.address = address.replaceFirst("http[s]?://", "");
 		
-		try {
-			this.url = new URL(protocol, address, port, method + query);
-			this.connection = (HttpsURLConnection) url.openConnection();
-			
-			inputStream = new BufferedInputStream(connection.getInputStream());
-			inputStream.mark(0);
-		} catch (MalformedURLException ex) {
-			Logger.getLogger(HttpRequest.class.getName()).log(Level.SEVERE, null, ex);
-		} catch (IOException ex){
-			Logger.getLogger(HttpRequest.class.getName()).log(Level.SEVERE, null, ex);
-		}
+		if(query == null)	
+			this.query = " ";
+		else if(query.isEmpty())	
+			this.query = " ";
+		else if(query.charAt(0) != '?')
+			this.query = "?" + query;
 	}
 	
 	public HttpRequest(String address, String method, String query){
@@ -59,14 +53,33 @@ public class HttpRequest {
 		this.method = method;
 		this.query = query;
 		
-		if(method.charAt(0) != '/')
-			method = "/" + method;
+		if(address == null)	
+			this.address = "localhost";
+		else if(address.isEmpty())	
+			this.address = "localhost";
+		else if(address.startsWith("http[s]?://"))
+			this.address = address.replaceFirst("http[s]?://", "");
 		
-		if(query.charAt(0) != '?')
-			query = "?" + query;
+		if(method == null)	
+			this.method = " ";
+		else if(method.isEmpty())	
+			this.method = " ";
+		else if(method.charAt(0) != '?')
+			this.method = "?" + method;
+		
+		if(query == null)	
+			this.query = " ";
+		else if(query.isEmpty())	
+			this.query = " ";
+		else if(query.charAt(0) != '?')
+			this.query = "?" + query;
+	}
+
+	public void openConnection(){
 		
 		try {
-			this.url = new URL(protocol, address, port, method + query);
+			this.url = new URL(
+				protocol, this.address, port, this.method + this.query);
 			this.connection = (HttpsURLConnection) url.openConnection();
 			
 			inputStream = new BufferedInputStream(connection.getInputStream());
@@ -76,14 +89,22 @@ public class HttpRequest {
 		} catch (IOException ex){
 			Logger.getLogger(HttpRequest.class.getName()).log(Level.SEVERE, null, ex);
 		}
+		
 	}
-
+	
 	public String getAddress() {
 		return address;
 	}
 
 	public void setAddress(String address) {
 		this.address = address;
+		
+		if(address == null)	
+			this.address = "localhost";
+		else if(address.isEmpty())	
+			this.address = "localhost";
+		else if(address.startsWith("http[s]?://"))
+			this.address = address.replaceFirst("http[s]?://", "");
 	}
 
 	public String getQuery() {
@@ -93,7 +114,11 @@ public class HttpRequest {
 	public void setQuery(String query) {
 		this.query = query;
 		
-		if(query.charAt(0) != '?')
+		if(query == null)	
+			this.query = " ";
+		else if(query.isEmpty())	
+			this.query = " ";
+		else if(query.charAt(0) != '?')
 			this.query = "?" + query;
 	}
 
@@ -104,8 +129,12 @@ public class HttpRequest {
 	public void setMethod(String method) {
 		this.method = method;
 		
-		if(method.charAt(0) != '?')
-			this.method = "?" + query;
+		if(method == null)	
+			this.method = " ";
+		else if(method.isEmpty())	
+			this.method = " ";
+		else if(method.charAt(0) != '?')
+			this.method = "?" + method;
 	}
 
 	public BufferedInputStream getInputStream() {
