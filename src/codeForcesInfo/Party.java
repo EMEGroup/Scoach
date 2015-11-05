@@ -1,23 +1,32 @@
 package codeForcesInfo;
 
-import java.util.*;
+import codeForcesInfo.MethodResponse.PartyType;
+import java.util.List;
 
 public class Party {
-	public enum type{
-		CONTESTANT,
-		PRACTICE,
-		VIRTUAL,
-		MANAGER,
-		OUT_OF_COMPETITION
-	}
+	
 	private int contestID;
 	private List<Member> members;
-	private type participantType;
+	private PartyType participantType;
 	private int teamID;
 	private String teamName;
 	private boolean ghost;
 	private int room;
-	private int startTimeSeconds;
+	private long startTimeSeconds;
+	
+	public Party(int contestID, List<Member> members, PartyType participantType, int teamID, String teamName, boolean ghost,
+			int room, long startTimeSeconds) {
+		
+		this.contestID = contestID;
+		this.members = members;
+		this.participantType = participantType;
+		this.teamID = teamID;
+		this.teamName = teamName;
+		this.ghost = ghost;
+		this.room = room;
+		this.startTimeSeconds = startTimeSeconds;
+	}
+	
 	public int getContestID() {
 		return contestID;
 	}
@@ -30,10 +39,10 @@ public class Party {
 	public void setMembers(List<Member> members) {
 		this.members = members;
 	}
-	public type getParticipantType() {
+	public PartyType getParticipantType() {
 		return participantType;
 	}
-	public void setParticipantType(type participantType) {
+	public void setParticipantType(PartyType participantType) {
 		this.participantType = participantType;
 	}
 	public int getTeamID() {
@@ -60,25 +69,10 @@ public class Party {
 	public void setRoom(int room) {
 		this.room = room;
 	}
-	public int getStartTimeSeconds() {
+	public long getStartTimeSeconds() {
 		return startTimeSeconds;
 	}
-	public void setStartTimeSeconds(int startTimeSeconds) {
+	public void setStartTimeSeconds(long startTimeSeconds) {
 		this.startTimeSeconds = startTimeSeconds;
 	}
-	public Party(int contestID, List<Member> members, type participantType, int teamID, String teamName, boolean ghost,
-			int room, int startTimeSeconds) {
-		super();
-		this.contestID = contestID;
-		this.members = members;
-		this.participantType = participantType;
-		this.teamID = teamID;
-		this.teamName = teamName;
-		this.ghost = ghost;
-		this.room = room;
-		this.startTimeSeconds = startTimeSeconds;
-	}
-	
-	
-	
 }

@@ -1,6 +1,6 @@
 package codeForcesInfo;
 /*
- * Clase que modela la estructura de datos User
+ * This class does model an user's data structure.
  */
 
 public class User {
@@ -18,8 +18,31 @@ public class User {
 	private int rating;
 	private String maxRank;
 	private int maxRating;
-	private int lastOnlineTimeSeconds; //Last time online
-	private int registrationTimeSeconds; //Cuanto tiempo tiene registrado
+	private long lastOnlineTimeSeconds; // Last time online
+	private long registrationTimeSeconds; // Time since registration
+	
+	public User(String handle, String email, String vkld, String openId, String firstName, String lastName,
+			String country, String city, String organization, int contribution, String rank, int rating, String maxRank,
+			int maxRating, long lastOnlineTimeSeconds, long registrationTimeSeconds) {
+		
+		this.handle = handle;
+		this.email = email;
+		this.vkld = vkld;
+		this.openId = openId;
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.country = country;
+		this.city = city;
+		this.organization = organization;
+		this.contribution = contribution;
+		this.rank = rank;
+		this.rating = rating;
+		this.maxRank = maxRank;
+		this.maxRating = maxRating;
+		this.lastOnlineTimeSeconds = lastOnlineTimeSeconds;
+		this.registrationTimeSeconds = registrationTimeSeconds;
+	}
+	
 	public String getHandle() {
 		return handle;
 	}
@@ -104,39 +127,16 @@ public class User {
 	public void setMaxRating(int maxRating) {
 		this.maxRating = maxRating;
 	}
-	public int getLastOnlineTimeSeconds() {
+	public long getLastOnlineTimeSeconds() {
 		return lastOnlineTimeSeconds;
 	}
-	public void setLastOnlineTimeSeconds(int lastOnlineTimeSeconds) {
+	public void setLastOnlineTimeSeconds(long lastOnlineTimeSeconds) {
 		this.lastOnlineTimeSeconds = lastOnlineTimeSeconds;
 	}
-	public int getRegistrationTimeSeconds() {
+	public long getRegistrationTimeSeconds() {
 		return registrationTimeSeconds;
 	}
-	public void setRegistrationTimeSeconds(int registrationTimeSeconds) {
+	public void setRegistrationTimeSeconds(long registrationTimeSeconds) {
 		this.registrationTimeSeconds = registrationTimeSeconds;
 	}
-	public User(String handle, String email, String vkld, String openId, String firstName, String lastName,
-			String country, String city, String organization, int contribution, String rank, int rating, String maxRank,
-			int maxRating, int lastOnlineTimeSeconds, int registrationTimeSeconds) {
-		super();
-		this.handle = handle;
-		this.email = email;
-		this.vkld = vkld;
-		this.openId = openId;
-		this.firstName = firstName;
-		this.lastName = lastName;
-		this.country = country;
-		this.city = city;
-		this.organization = organization;
-		this.contribution = contribution;
-		this.rank = rank;
-		this.rating = rating;
-		this.maxRank = maxRank;
-		this.maxRating = maxRating;
-		this.lastOnlineTimeSeconds = lastOnlineTimeSeconds;
-		this.registrationTimeSeconds = registrationTimeSeconds;
-	}
-	
-	
 }

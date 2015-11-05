@@ -1,16 +1,27 @@
 package codeForcesInfo;
 
 /*
- * Representa una participacion de un usuario en un concurso rated.
+ * Represents a participation of a user in a rated contest.
  */
 
 public class RatingChange {
 	public int contestID;
 	public String contestName;
 	public int rank;
-	public int ratingUpdateTimeSeconds;
+	public long ratingUpdateTimeSeconds;
 	public int oldRating;
 	public int newRating;
+	
+	public RatingChange(int contestID, String contestName, int rank, 
+			long ratingUpdateTimeSeconds, int oldRating, int newRating) {
+		
+		this.contestID = contestID;
+		this.contestName = contestName;
+		this.rank = rank;
+		this.ratingUpdateTimeSeconds = ratingUpdateTimeSeconds;
+		this.oldRating = oldRating;
+		this.newRating = newRating;
+	}
 	
 	public int getContestID() {
 		return contestID;
@@ -30,10 +41,10 @@ public class RatingChange {
 	public void setRank(int rank) {
 		this.rank = rank;
 	}
-	public int getRatingUpdateTimeSeconds() {
+	public long getRatingUpdateTimeSeconds() {
 		return ratingUpdateTimeSeconds;
 	}
-	public void setRatingUpdateTimeSeconds(int ratingUpdateTimeSeconds) {
+	public void setRatingUpdateTimeSeconds(long ratingUpdateTimeSeconds) {
 		this.ratingUpdateTimeSeconds = ratingUpdateTimeSeconds;
 	}
 	public int getOldRating() {
@@ -47,18 +58,5 @@ public class RatingChange {
 	}
 	public void setNewRating(int newRating) {
 		this.newRating = newRating;
-	}
-	public RatingChange(int contestID, String contestName, int rank, int ratingUpdateTimeSeconds, int oldRating,
-			int newRating) {
-		super();
-		this.contestID = contestID;
-		this.contestName = contestName;
-		this.rank = rank;
-		this.ratingUpdateTimeSeconds = ratingUpdateTimeSeconds;
-		this.oldRating = oldRating;
-		this.newRating = newRating;
-	}
-	
-	
-	
+	}	
 }

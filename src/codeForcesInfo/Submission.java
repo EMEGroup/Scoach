@@ -1,39 +1,42 @@
 package codeForcesInfo;
+
+import codeForcesInfo.MethodResponse.ProblemVerdict;
+
 /*
- * Estructura del dato submission de CodeForces.
+ * Codeforces submission's data structure.
  */
 
 public class Submission {
-	public enum verdictEnum{
-		FAILED,
-		OK,
-		PARTIAL,
-		COMPILATION_ERROR,
-		RUNTIME_ERROR,
-		WRONG_ANSWER,
-		PRESENTATION_ERROR,
-		TIME_LIMIT_EXCEEDED,
-		MEMORY_LIMIT_EXCEEDED,
-		IDLENESS_LIMIT_EXCEEDED,
-		SECURITY_VIOLATED,
-		CRASHED,
-		INPUT_PREPARATION_CRASHED,
-		CHALLENGED,
-		SKIPPED,
-		TESTING,
-		REJECTED
-	}
+	
 	private int id;
 	private int contestId;
-	private int creationTimeSeconds;
-	private int relativeTimeSeconds;
+	private long creationTimeSeconds;
+	private long relativeTimeSeconds;
 	private Problem problem;
 	private Party author;
 	private String programmingLanguage;
-	private verdictEnum verdict;
+	private ProblemVerdict verdict;
 	private int passedTestCount;
 	private int timeConsumedMillis;
 	private int memoryConsumedBytes;
+	
+	public Submission(int id, int contestId, long creationTimeSeconds, long relativeTimeSeconds, Problem problem,
+			Party author, String programmingLanguage, ProblemVerdict verdict, int passedTestCount, int timeConsumedMillis,
+			int memoryConsumedBytes) {
+		
+		this.id = id;
+		this.contestId = contestId;
+		this.creationTimeSeconds = creationTimeSeconds;
+		this.relativeTimeSeconds = relativeTimeSeconds;
+		this.problem = problem;
+		this.author = author;
+		this.programmingLanguage = programmingLanguage;
+		this.verdict = verdict;
+		this.passedTestCount = passedTestCount;
+		this.timeConsumedMillis = timeConsumedMillis;
+		this.memoryConsumedBytes = memoryConsumedBytes;
+	}
+	
 	public int getId() {
 		return id;
 	}
@@ -46,16 +49,16 @@ public class Submission {
 	public void setContestId(int contestId) {
 		this.contestId = contestId;
 	}
-	public int getCreationTimeSeconds() {
+	public long getCreationTimeSeconds() {
 		return creationTimeSeconds;
 	}
-	public void setCreationTimeSeconds(int creationTimeSeconds) {
+	public void setCreationTimeSeconds(long creationTimeSeconds) {
 		this.creationTimeSeconds = creationTimeSeconds;
 	}
-	public int getRelativeTimeSeconds() {
+	public long getRelativeTimeSeconds() {
 		return relativeTimeSeconds;
 	}
-	public void setRelativeTimeSeconds(int relativeTimeSeconds) {
+	public void setRelativeTimeSeconds(long relativeTimeSeconds) {
 		this.relativeTimeSeconds = relativeTimeSeconds;
 	}
 	public Problem getProblem() {
@@ -76,10 +79,10 @@ public class Submission {
 	public void setProgrammingLanguage(String programmingLanguage) {
 		this.programmingLanguage = programmingLanguage;
 	}
-	public verdictEnum getVerdict() {
+	public ProblemVerdict getVerdict() {
 		return verdict;
 	}
-	public void setVerdict(verdictEnum verdict) {
+	public void setVerdict(ProblemVerdict verdict) {
 		this.verdict = verdict;
 	}
 	public int getPassedTestCount() {
@@ -99,24 +102,5 @@ public class Submission {
 	}
 	public void setMemoryConsumedBytes(int memoryConsumedBytes) {
 		this.memoryConsumedBytes = memoryConsumedBytes;
-	}
-	public Submission(int id, int contestId, int creationTimeSeconds, int relativeTimeSeconds, Problem problem,
-			Party author, String programmingLanguage, verdictEnum verdict, int passedTestCount, int timeConsumedMillis,
-			int memoryConsumedBytes) {
-		super();
-		this.id = id;
-		this.contestId = contestId;
-		this.creationTimeSeconds = creationTimeSeconds;
-		this.relativeTimeSeconds = relativeTimeSeconds;
-		this.problem = problem;
-		this.author = author;
-		this.programmingLanguage = programmingLanguage;
-		this.verdict = verdict;
-		this.passedTestCount = passedTestCount;
-		this.timeConsumedMillis = timeConsumedMillis;
-		this.memoryConsumedBytes = memoryConsumedBytes;
-	}
-	
-	
-	
+	}	
 }

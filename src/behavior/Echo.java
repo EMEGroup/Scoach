@@ -1,33 +1,20 @@
 package behavior;
 
-import httpHandling.HttpRequest;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import Misc.GeneralStuff;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-public class Echo extends Thread {
+public class Echo extends GeneralBehavior {
 	
-	private HttpRequest connection;
-	private Map<String, List<String>> properties;
-	private String host, method, query;
-	
-	public Echo(String hostAddress, String methodString, String queryString){
-		host = hostAddress;
-		method = methodString;
-		query = queryString;
-	}
-	
-	public void Run(Map<String, List<String>> requestProperties){
-		connection = new HttpRequest(host, method, query);
-		connection.startConnection();
-		
+	@Override
+	public Map<String, String> Run(Map<String, List<String>> requestProperties){
 		if(requestProperties == null)
-				return;
+				return null;
 		
-		String text = "";
+		Map<String, String> responseProperties = new HashMap<String, String>();
+		
+		String text = "", Z = "\"";
 		
 		if(requestProperties.get("text") != null){
 			text = requestProperties.get("text").get(0);
@@ -38,34 +25,31 @@ public class Echo extends Thread {
 		
 		String msg = 
 			"payload={ " +
-			"text: " + text + ",";
+			"\"text\": " + "\"" + text + "\"";
 		
 		if(requestProperties.get("channel_name") != null){
-			msg = msg + "channel: #" +
-				requestProperties.get("channel_name").get(0);
+			
+			if(requestProperties.get("channel_name").get(0).equals("privategroup")){
+				
+				String channel_name = GeneralStuff.getChannelInfo(
+					requestProperties.get("channel_id").get(0));
+				
+				msg = msg + ", \"channel\": \"#" + channel_name + "\"";
+			}
+			else{
+				msg = msg + ", \"channel\": \"#" +
+					requestProperties.get("channel_name").get(0) + "\"";
+			}
 		}
 		else if(requestProperties.get("user_name") != null){
-			msg = msg + "channel: @" +
-				requestProperties.get("user_name").get(0);
+			msg = msg + ", \"channel\": \"@" +
+				requestProperties.get("user_name").get(0) + "\"";
 		}
 		
 		msg += "}";
 		
-		System.out.println(msg);
-		connection.write(msg);
+		System.out.println(msg);	// Debug
 		
-		InputStreamReader is = 
-			new InputStreamReader(connection.getInputStream());
-		
-		char[] asdf = new char[1024];
-		try {
-			is.read(asdf);
-		} catch (IOException ex) {
-			Logger.getLogger(Echo.class.getName()).log(Level.SEVERE, null, ex);
-		}
-		System.out.println( asdf );
-		
-		connection.getConnection().disconnect();
+		return responseProperties;
 	}
 }
-	

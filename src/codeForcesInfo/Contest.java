@@ -1,36 +1,42 @@
 package codeForcesInfo;
 
+import codeForcesInfo.MethodResponse.ContestPhase;
+import codeForcesInfo.MethodResponse.ContestType;
+
 /*
- * Clase que modela la estructura de datos Contest.
+ * This class does model a contest's data structure.
  */
 public class Contest {
 	
-	public enum type{
-	CF,
-	IOI,
-	ICPC
-	}
-	
-	public enum phase{
-		BEFORE,
-		CODING,
-		PENDING_SYSTEM_TEST,
-		SYSTEM_TEST,
-		FINISHED
-	}
-	
 	private int ID;
 	private String name;
-	private type type;
-	private phase phase;
+	private ContestType type;
+	private ContestPhase phase;
 	private boolean frozen;
-	private int durationSeconds;
+	private long durationSeconds;
 	private String description;
 	private int difficulty;
 	private String kind;
 	private String country;
 	private String city;
 	private String season;
+	
+	public Contest(int ID, String name, ContestType type, ContestPhase phase, boolean frozen, long durationSeconds, 
+			String description, int difficulty, String kind, String country, String city, String season){
+		
+		this.ID = ID;
+		this.name = name;
+		this.type = type;
+		this.phase = phase;
+		this.frozen = frozen;
+		this.durationSeconds = durationSeconds;
+		this.description = description;
+		this.difficulty = difficulty;
+		this.kind = kind;
+		this.country = country;
+		this.city = city;
+		this.season = season;
+	}
 	
 	public int getID() {
 		return ID;
@@ -44,16 +50,16 @@ public class Contest {
 	public void setName(String name) {
 		this.name = name;
 	}
-	public type getType() {
+	public ContestType getType() {
 		return type;
 	}
-	public void setType(type type) {
+	public void setType(ContestType type) {
 		this.type = type;
 	}
-	public phase getPhase() {
+	public ContestPhase getPhase() {
 		return phase;
 	}
-	public void setPhase(phase phase) {
+	public void setPhase(ContestPhase phase) {
 		this.phase = phase;
 	}
 	public boolean isFrozen() {
@@ -62,10 +68,10 @@ public class Contest {
 	public void setFrozen(boolean frozen) {
 		this.frozen = frozen;
 	}
-	public int getDurationSeconds() {
+	public long getDurationSeconds() {
 		return durationSeconds;
 	}
-	public void setDurationSeconds(int durationSeconds) {
+	public void setDurationSeconds(long durationSeconds) {
 		this.durationSeconds = durationSeconds;
 	}
 	public String getDescription() {
