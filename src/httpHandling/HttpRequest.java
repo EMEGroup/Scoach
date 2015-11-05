@@ -1,7 +1,7 @@
 package httpHandling;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.logging.Level;
@@ -13,7 +13,6 @@ public class HttpRequest {
 	private final short port = -1;
 	
 	private String address = "", method = "/", query = "";
-	private BufferedInputStream inputStream;
 	
 	private URL url;
 	private HttpsURLConnection connection;
@@ -64,8 +63,8 @@ public class HttpRequest {
 			this.method = " ";
 		else if(method.isEmpty())	
 			this.method = " ";
-		else if(method.charAt(0) != '?')
-			this.method = "?" + method;
+		else if(method.charAt(0) != '/')
+			this.method = "/" + method;
 		
 		if(query == null)	
 			this.query = " ";
@@ -75,15 +74,14 @@ public class HttpRequest {
 			this.query = "?" + query;
 	}
 
-	public void openConnection(){
+	public void startConnection(){
 		
 		try {
 			this.url = new URL(
 				protocol, this.address, port, this.method + this.query);
 			this.connection = (HttpsURLConnection) url.openConnection();
+			this.connection.setDoOutput(true);
 			
-			inputStream = new BufferedInputStream(connection.getInputStream());
-			inputStream.mark(0);
 		} catch (MalformedURLException ex) {
 			Logger.getLogger(HttpRequest.class.getName()).log(Level.SEVERE, null, ex);
 		} catch (IOException ex){
@@ -133,15 +131,34 @@ public class HttpRequest {
 			this.method = " ";
 		else if(method.isEmpty())	
 			this.method = " ";
-		else if(method.charAt(0) != '?')
-			this.method = "?" + method;
+		else if(method.charAt(0) != '/')
+			this.method = "/" + method;
 	}
 
-	public BufferedInputStream getInputStream() {
-		return inputStream;
+	public InputStream getInputStream() {
+		try {
+			return this.connection.getInputStream();
+		} catch (IOException ex) {
+			Logger.getLogger(HttpRequest.class.getName()).log(Level.SEVERE, null, ex);
+		}
+		return null;
 	}
 
 	public HttpsURLConnection getConnection() {
 		return connection;
+	}
+	
+	public int write(String message){
+		try {
+			connection.getOutputStream().write(message.getBytes());
+			connection.getOutputStream().flush();
+			connection.getOutputStream().close();
+			return connection.getResponseCode();
+			
+		} catch (IOException ex) {
+			Logger.getLogger(HttpRequest.class.getName()).log(Level.SEVERE, null, ex);
+		}
+		
+		return 0;
 	}
 }

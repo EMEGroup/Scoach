@@ -1,11 +1,12 @@
 package behavior;
 
 import httpHandling.HttpRequest;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Echo extends Thread {
 	
@@ -21,7 +22,7 @@ public class Echo extends Thread {
 	
 	public void Run(Map<String, List<String>> requestProperties){
 		connection = new HttpRequest(host, method, query);
-		connection.openConnection();
+		connection.startConnection();
 		
 		if(requestProperties == null)
 				return;
@@ -37,18 +38,34 @@ public class Echo extends Thread {
 		
 		String msg = 
 			"payload={ " +
-			"\"text\": " + "\""+text+"\",";
+			"text: " + text + ",";
 		
-		if(requestProperties.get("channel") == null){
-			msg = msg + "\"channel\":" + 
-				"\"@"+requestProperties.get("user_name").get(0)+"\"";
+		if(requestProperties.get("channel_name") != null){
+			msg = msg + "channel: #" +
+				requestProperties.get("channel_name").get(0);
 		}
-		else{
-			msg = msg + "\"channel\":" + 
-				"\"#"+requestProperties.get("channel_name").get(0)+"\"";
+		else if(requestProperties.get("user_name") != null){
+			msg = msg + "channel: @" +
+				requestProperties.get("user_name").get(0);
 		}
 		
 		msg += "}";
+		
+		System.out.println(msg);
+		connection.write(msg);
+		
+		InputStreamReader is = 
+			new InputStreamReader(connection.getInputStream());
+		
+		char[] asdf = new char[1024];
+		try {
+			is.read(asdf);
+		} catch (IOException ex) {
+			Logger.getLogger(Echo.class.getName()).log(Level.SEVERE, null, ex);
+		}
+		System.out.println( asdf );
+		
+		connection.getConnection().disconnect();
 	}
 }
 	
