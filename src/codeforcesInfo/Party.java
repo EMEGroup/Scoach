@@ -1,6 +1,6 @@
-package codeForcesInfo;
+package codeforcesInfo;
 
-import codeForcesInfo.MethodResponse.PartyType;
+import codeforcesInfo.Methods.PartyType;
 import java.util.List;
 
 public class Party {

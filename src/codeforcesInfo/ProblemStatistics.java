@@ -1,4 +1,4 @@
-package codeForcesInfo;
+package codeforcesInfo;
 
 public class ProblemStatistics {
 

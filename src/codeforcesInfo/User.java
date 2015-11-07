@@ -1,4 +1,4 @@
-package codeForcesInfo;
+package codeforcesInfo;
 /*
  * This class does model an user's data structure.
  */

@@ -1,4 +1,4 @@
-package codeForcesInfo;
+package codeforcesInfo;
 
 /*
  * Represents a participation of a user in a rated contest.

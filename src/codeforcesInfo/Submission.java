@@ -1,12 +1,12 @@
-package codeForcesInfo;
+package codeforcesInfo;
 
-import codeForcesInfo.MethodResponse.ProblemVerdict;
+import codeforcesInfo.Methods.ProblemVerdict;
 
 /*
  * Codeforces submission's data structure.
  */
 
-public class Submission {
+public class Submission implements Comparable<Submission>{
 	
 	private int id;
 	private int contestId;
@@ -103,4 +103,14 @@ public class Submission {
 	public void setMemoryConsumedBytes(int memoryConsumedBytes) {
 		this.memoryConsumedBytes = memoryConsumedBytes;
 	}	
+
+	@Override
+	public int compareTo(Submission t) {
+		if(this.creationTimeSeconds < t.creationTimeSeconds)
+			return -1;
+		else if(this.creationTimeSeconds == t.creationTimeSeconds)
+			return 0;
+		else
+			return 1;
+	}
 }
