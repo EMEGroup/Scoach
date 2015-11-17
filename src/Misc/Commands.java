@@ -104,18 +104,13 @@ public class Commands {
 			result.put( x.getKey(), x.getValue().get(0));
 		}
 		
-		if(messageProperties.get("channel_name") != null){
+		if(messageProperties.get("channel_id") != null){
 			
-			if(messageProperties.get("channel_name").get(0).equals("privategroup")){
-				 result.put("channel", "#" + GeneralStuff.getChannelInfo(
-					messageProperties.get("channel_id").get(0)));
-			}
-			else{
-				result.put("channel", "#" + 
-					messageProperties.get("channel_name").get(0));
-			}
+			result.put("channel", "#" + GeneralStuff.getChannelInfo(
+				messageProperties.get("channel_id").get(0)) );
 		}
 		else if(messageProperties.get("user_name") != null){
+                    
 			result.put("channel", "@" + 
 				messageProperties.get("user_name").get(0));
 		}
