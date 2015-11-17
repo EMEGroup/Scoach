@@ -4,9 +4,9 @@
  * and open the template in the editor.
  */
 
-package codeForcesInfo;
+package codeforcesInfo;
 
-import codeForcesInfo.MethodResponse.HackVerdict;
+import codeforcesInfo.Methods.HackVerdict;
 
 public class Hack {
 	

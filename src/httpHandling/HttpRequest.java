@@ -9,10 +9,12 @@ import java.util.logging.Logger;
 import javax.net.ssl.HttpsURLConnection;
 
 public class HttpRequest {
+	private String addr;
 	private URL url = null;
 	private HttpsURLConnection connection = null;
     
 	public HttpRequest(String address){
+		addr = address;
 		
 		try {
 			url = new URL(address);
@@ -33,6 +35,10 @@ public class HttpRequest {
 		} catch (IOException ex) {
 			Logger.getLogger(HttpRequest.class.getName()).log(Level.SEVERE, null, ex);
 		}
+	}
+	
+	public void disconnect(){
+		connection.disconnect();
 	}
 	
 	public String getHost()		{return url.getHost();	}
@@ -63,5 +69,9 @@ public class HttpRequest {
 		}
 		
 		return 0;
+	}
+	
+	public HttpRequest reset(){
+		return new HttpRequest(addr);
 	}
 }

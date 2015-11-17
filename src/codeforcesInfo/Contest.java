@@ -1,7 +1,7 @@
-package codeForcesInfo;
+package codeforcesInfo;
 
-import codeForcesInfo.MethodResponse.ContestPhase;
-import codeForcesInfo.MethodResponse.ContestType;
+import codeforcesInfo.Methods.ContestPhase;
+import codeforcesInfo.Methods.ContestType;
 
 /*
  * This class does model a contest's data structure.
@@ -14,6 +14,7 @@ public class Contest {
 	private ContestPhase phase;
 	private boolean frozen;
 	private long durationSeconds;
+	private String websiteUrl;
 	private String description;
 	private int difficulty;
 	private String kind;
@@ -22,7 +23,7 @@ public class Contest {
 	private String season;
 	
 	public Contest(int ID, String name, ContestType type, ContestPhase phase, boolean frozen, long durationSeconds, 
-			String description, int difficulty, String kind, String country, String city, String season){
+			String websiteUrl, String description, int difficulty, String kind, String country, String city, String season){
 		
 		this.ID = ID;
 		this.name = name;
@@ -30,6 +31,7 @@ public class Contest {
 		this.phase = phase;
 		this.frozen = frozen;
 		this.durationSeconds = durationSeconds;
+		this.websiteUrl = websiteUrl;
 		this.description = description;
 		this.difficulty = difficulty;
 		this.kind = kind;
@@ -73,6 +75,12 @@ public class Contest {
 	}
 	public void setDurationSeconds(long durationSeconds) {
 		this.durationSeconds = durationSeconds;
+	}
+	public String getWebsiteUrl() {
+		return websiteUrl;
+	}
+	public void setWebsiteUrl(String websiteUrl) {
+		this.websiteUrl = websiteUrl;
 	}
 	public String getDescription() {
 		return description;

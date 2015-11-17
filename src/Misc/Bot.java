@@ -1,47 +1,57 @@
 package Misc;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class Bot {
 	
-	public static void main(String[] args) {	TEST();	}
+	public static void main(String[] args) {	
+		TEST();
+	}
 	
-	public static void work(Map<String, List<String>> requestProperties){
+	public static void work(Map<String, String[]> requestProperties){
 		
 		if(requestProperties.get("text") == null)
 			return;
 		
-		String command = requestProperties.get("text").get(0).split(" ")[0];
+		Set<Map.Entry<String, String[]>> entrySet = requestProperties.entrySet();
+		Map<String, List<String>> reqProperties = 
+			new HashMap<String, List<String>>();
 		
-		requestProperties.get("text").set(0, 
-			requestProperties.get("text").get(0).replaceFirst(command, ""));
+		for(Map.Entry<String, String[]> entry : entrySet){
+			reqProperties.put(entry.getKey(), Arrays.asList(entry.getValue()));
+		}
+		
+		String command = reqProperties.get("text").get(0).split(" ")[0];
+		
+		reqProperties.get("text").set(0,
+			reqProperties.get("text").get(0).replaceFirst(command+"[ \t]*", ""));
 		command = command.toLowerCase();
 		
 		if(GeneralStuff.commands.get(command) != null)
-			GeneralStuff.commands.get(command).execute(requestProperties);
+			GeneralStuff.commands.get(command).execute(reqProperties);
+		else
+			GeneralStuff.commands.get("help").execute(reqProperties);
 	}
 	
 	@SuppressWarnings("unchecked")
 	private static void TEST(){
 		System.out.println("SLACK COACH BOT TESTING.");
 		
-		ArrayList<String> x = new ArrayList<String>();
-		Map<String, List<String>> h = new HashMap<String, List<String>>();
+		String[] x = new String[1];
+		Map<String, String[]> h = new HashMap<String, String[]>();
 		
-		x.add("EcHO Buenas tardes, scoach");
-		h.put("text", (List<String>) x.clone());
-		x.remove(0);
+		x[0] = "submissions --by mamelui --verdict AC --since 1y";
+		h.put("text", x.clone());
 		
-		x.add("privategroup");
-		h.put("channel_name", (List<String>) x.clone());
-		x.remove(0);
+		x[0] = "scoachcan";
+		h.put("channel_name", x.clone());
 		
-		x.add("C0AFK0UJD");
-		h.put("channel_id", (List<String>) x.clone());
-		x.remove(0);
+		x[0] = "C0AFK0UJD";
+		h.put("channel_id", x.clone());
 		
 		work(h);
 	}

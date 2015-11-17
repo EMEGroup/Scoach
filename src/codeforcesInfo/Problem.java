@@ -1,6 +1,6 @@
-package codeForcesInfo;
+package codeforcesInfo;
 
-import codeForcesInfo.MethodResponse.ProblemType;
+import codeforcesInfo.Methods.ProblemType;
 import java.util.List;
 
 public class Problem {
@@ -58,5 +58,9 @@ public class Problem {
 	}
 	public void setTags(List<String> tags) {
 		this.tags = tags;
+	}
+	
+	public String getProblemLink(){
+		return "";
 	}
 }

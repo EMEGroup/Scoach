@@ -16,7 +16,8 @@ public class GeneralStuff {
 	public final static String APIToken = "xoxp-10522107940-10536035312-12886577955-3187f9ba9a"; // Change it !!
 	public final static String WebhookUrl = "https://hooks.slack.com/services/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";
 	public final static String SlackApiURL = "https://slack.com/api";
-	public final static HashMap<String, Command> commands;
+	public final static String defaultChannel = "#privategroup";
+	public final static Map<String, Command> commands;
 	
 	static {
 		final Commands C = new Commands();
@@ -25,7 +26,17 @@ public class GeneralStuff {
 		
 		commands.put("echo", new Command(){
 			@Override
-			public void execute(Map<String, List<String>> req){ C.echo(req); } 
+			public void execute(Map<String, List<String>> req){ C.echo(req); }
+		});
+		
+		commands.put("submissions", new Command(){
+			@Override
+			public void execute(Map<String, List<String>> req){ C.submissions(req); }
+		});
+		
+		commands.put("help", new Command(){
+			@Override
+			public void execute(Map<String, List<String>> req){ C.help(req); }
 		});
 	}
 	
@@ -39,8 +50,6 @@ public class GeneralStuff {
 	}
 	
 	public static String getChannelInfo(String channelId){
-		// This class works as a placeholder of the codeforces methods
-		
 		HttpRequest req = new HttpRequest(
 			SlackApiURL+"/channels.info?token="+APIToken+"&channel="+channelId);
 		req.startConnection();
@@ -64,7 +73,7 @@ public class GeneralStuff {
 		return channel_name;
 	}
 	
-	private class ChannelInfo{
+	class ChannelInfo{
 		public String status;
 		public String name;
 		public ChannelInfo channel;
