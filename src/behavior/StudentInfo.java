@@ -9,15 +9,11 @@ import static behavior.Echo.helpText;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.util.Properties;
 
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
-import java.sql.ResultSet;
-import java.sql.Statement;
 
 /**
  *
