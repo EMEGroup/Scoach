@@ -44,13 +44,13 @@ public class Bot {
 		String[] x = new String[1];
 		Map<String, String[]> h = new HashMap<String, String[]>();
 		
-		x[0] = "echo Probando el bot desde fuera de slack.";
+		x[0] = "echo El chicharrón no es carne, es pellejo.";
 		h.put("text", x.clone());
 		
 		x[0] = "privategroup";
 		h.put("channel_name", x.clone());
 		
-		x[0] = "C0AFK0UJD";
+		x[0] = "C0D50765C";
 		h.put("channel_id", x.clone());
 		
 		work(h);

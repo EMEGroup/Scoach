@@ -2,6 +2,7 @@ package Misc;
 
 import behavior.*;
 import httpHandling.HttpRequest;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -24,7 +25,7 @@ public class Commands {
 		String text = result.get("text");
 		requestProperties.put("text", Arrays.asList(new String[]{text}));
 		
-		_sendMessage( forgeMessage(requestProperties) );
+		_sendMessage( _forgeMessage(requestProperties) );
 	}
 	
 	public void echo(Map<String, List<String>> requestProperties){
@@ -38,14 +39,14 @@ public class Commands {
 		String text = result.get("text");
 		requestProperties.put("text", Arrays.asList(new String[]{text}));
 		
-		_sendMessage( forgeMessage(requestProperties) );
+		_sendMessage( _forgeMessage(requestProperties) );
 	}
 	
 	public void submissions(Map<String, List<String>> requestProperties){
 		Submissions _submissions = new Submissions();
 		
 		Map<String, String> result = 
-			_submissions.Run( getArguments(requestProperties) );
+			_submissions.Run( _getArguments(requestProperties) );
 		
 		if(result == null)
 			return;
@@ -53,7 +54,22 @@ public class Commands {
 		String text = result.get("text");
 		requestProperties.put("text", Arrays.asList(new String[]{text}));
 		
-		_sendMessage( forgeMessage(requestProperties) );
+		_sendMessage( _forgeMessage(requestProperties) );
+	}
+	
+	public void studentInfo(Map<String, List<String>> requestProperties) throws IOException, InterruptedException{
+		StudentInfo _studentInfo= new StudentInfo();
+                
+		Map<String, String> result = 
+			_studentInfo.Run(requestProperties);
+		
+		if(result == null) 
+			return;
+		
+		String text= result.get("text");
+		requestProperties.put("text", Arrays.asList(new String[]{text}));
+		
+		_sendMessage( _forgeMessage(requestProperties) );
 	}
 	
 	private void _sendMessage(Map<String,String> messageProperties){
@@ -76,8 +92,6 @@ public class Commands {
 		
 		message += "}";
 		
-		System.out.println(message);	// Debug
-		
 		HttpRequest conn;
 		
 		if(messageProperties.containsKey("queryString"))
@@ -91,7 +105,7 @@ public class Commands {
 		
 	}
 	
-	private Map<String, String> forgeMessage(Map<String, List<String>> messageProperties){
+	private Map<String, String> _forgeMessage(Map<String, List<String>> messageProperties){
 		
 		Map<String, String> result = new HashMap<String, String>();
 		
@@ -104,24 +118,40 @@ public class Commands {
 			result.put( x.getKey(), x.getValue().get(0));
 		}
 		
+		String channel = "";
 		if(messageProperties.get("channel_id") != null){
+			boolean privateGroup = false;
 			
-			result.put("channel", "#" + GeneralStuff.getChannelInfo(
-				messageProperties.get("channel_id").get(0)) );
+			if(messageProperties.get("channel_name") != null && 
+				messageProperties.get("channel_name").get(0).equals("privategroup"))
+				privateGroup = true;
+			
+			channel = GeneralStuff.getChannelInfo(
+				messageProperties.get("channel_id").get(0), privateGroup);
+			
+			if( channel.isEmpty() == false )
+				channel = "#" + channel;
 		}
-		else if(messageProperties.get("user_name") != null){
-                    
-			result.put("channel", "@" + 
-				messageProperties.get("user_name").get(0));
+		
+		if(messageProperties.get("user_id") != null && channel.isEmpty() ){
+            
+			channel = GeneralStuff.getUserInfo(
+				messageProperties.get("user_id").get(0));
+			
+			if(channel.isEmpty() == false)
+				channel = "@" + channel;
 		}
-		else{
-			result.put("channel", GeneralStuff.defaultChannel);
+		
+		if( channel.isEmpty() ){
+			channel = GeneralStuff.defaultChannel;
 		}
+		
+		result.put("channel", channel);
 		
 		return result;
 	}
 	
-	private Map<String, List<String>> getArguments(Map<String, List<String>> requestProperties){
+	private Map<String, List<String>> _getArguments(Map<String, List<String>> requestProperties){
 		Map<String, List<String>> args = new HashMap<String, List<String>>();
 		
 		String text = "";
@@ -153,4 +183,5 @@ public class Commands {
 		
 		return args;
 	}
+	
 }
