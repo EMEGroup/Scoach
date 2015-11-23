@@ -1,13 +1,12 @@
 package behavior;
 
-import Misc.GeneralStuff;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class Help extends GeneralBehavior{
 
-	public static final String helpText =
+	public static final String HELPTEXT =
 			"Available commands:\n"
 			+ "    echo                                 Repeats what you write.\n"
 			+ "    submissions                          Show submissions of an user.\n"
@@ -19,9 +18,10 @@ public class Help extends GeneralBehavior{
 	static{
 		commandsHelp = new HashMap<String, String>();
 		
-		commandsHelp.put("echo", Echo.helpText);
-		commandsHelp.put("help", Help.helpText);
-		commandsHelp.put("submissions", Submissions.helpText);
+		commandsHelp.put("echo", Echo.HELPTEXT);
+		commandsHelp.put("help", Help.HELPTEXT);
+		commandsHelp.put("submissions", Submissions.HELPTEXT);
+		commandsHelp.put("student", StudentInfo.HELPTEXT);
 	}
 	
 	@Override
@@ -31,19 +31,19 @@ public class Help extends GeneralBehavior{
 		
 		String command = null;
 		
-		if(requestProperties.get("text") != null && requestProperties.get("text").size() > 0){
+		if(requestProperties != null && requestProperties.get("text") != null && 
+			requestProperties.get("text").size() > 0){
+			
 			command = requestProperties.get("text").get(0);
 			command = command.split(" ")[0];
-		}
-		
-		if(command != null){
+			
 			if(commandsHelp.containsKey(command)){
 				responseProperties.put("text", commandsHelp.get(command));
 				return responseProperties;
 			}
 		}
 		
-		responseProperties.put("text", helpText);
+		responseProperties.put("text", HELPTEXT);
 		return responseProperties;
 	}
 

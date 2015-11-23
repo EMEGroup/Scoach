@@ -6,7 +6,7 @@ import java.util.Map;
 
 public class Submissions extends GeneralBehavior{
 	
-	public static final String helpText = 
+	public static final String HELPTEXT = 
 		"submissions [OPTIONS] --by <codeforces handle of the user>\n" +
 		"OPTIONS:\n" +
 		"\t--tags <tag>[,<tag> ...]\t\tA comma separated list of problem tags. (dp, math, greedy ...)\n" +
@@ -20,21 +20,20 @@ public class Submissions extends GeneralBehavior{
 	@Override
 	public Map<String, String> Run(Map<String, List<String>> requestProperties) {
 		
-		String text = helpText;
-		String handle = null;
+		String handle;
 		String time = null;
 		int count = 1;
 		Long from = null;
 		String verdict = null;
 		
-		Map<String, String> responseProperties = null;
+		Map<String, String> responseProperties;
 		
 		if(requestProperties.get("by") != null){
 			handle = requestProperties.get("by").get(0);
 		}
 		else{
 			responseProperties = new HashMap<String, String>();
-			responseProperties.put("text", text);
+			responseProperties.put("text", HELPTEXT);
 			return responseProperties;
 		}
 		

@@ -5,7 +5,6 @@
  */
 package behavior;
 
-import static behavior.Echo.helpText;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,7 +19,9 @@ import com.jcraft.jsch.Session;
  * @author Ernesto
  */
 public class StudentInfo extends GeneralBehavior {
-
+	
+	public static final String HELPTEXT = "";
+	
     void doSshTunnel(String strSshUser, String strSshPassword, String strSshHost, int nSshPort, String strRemoteHost, int nLocalPort, int nRemotePort) throws JSchException {
         final JSch jsch = new JSch();
         Session session = jsch.getSession(strSshUser, strSshHost, 22);
@@ -39,7 +40,7 @@ public class StudentInfo extends GeneralBehavior {
 
         Map<String, String> responseProperties = new HashMap<String, String>();
 
-        responseProperties.put("text", helpText);
+        responseProperties.put("text", HELPTEXT);
 
         String text = null;
         if (requestProperties != null && requestProperties.get("text") != null) {
