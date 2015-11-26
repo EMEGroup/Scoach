@@ -158,6 +158,29 @@ public class Methods {
 		}
 	}
 	
+	private static String translateVerdict( ProblemVerdict verdict){
+		if(verdict == null)	return null;
+		
+		if(verdict == ProblemVerdict.OK)
+			return "AC";
+		if(verdict == ProblemVerdict.WRONG_ANSWER)
+			return "WA";
+		if(verdict == ProblemVerdict.TIME_LIMIT_EXCEEDED)
+			return "TLE";
+		if(verdict == ProblemVerdict.MEMORY_LIMIT_EXCEEDED)
+			return "MLE";
+		if(verdict == ProblemVerdict.COMPILATION_ERROR)
+			return "CE";
+		if(verdict == ProblemVerdict.RUNTIME_ERROR)
+			return "RTE";
+		if(verdict == ProblemVerdict.PRESENTATION_ERROR)
+			return "PE";
+		if(verdict == ProblemVerdict.CHALLENGED)
+			return "HACKED";
+		
+		return null;
+	}
+	
 	public static Map<String, String> getSubmissions(String handle, 
 		Long startingTime, int count, String verdict, List<String> tags){
 		
@@ -225,16 +248,22 @@ public class Methods {
 				}
 			}
 			
-
-			
-			String text = "";
+			String text = 
+				"PROBLEM NAME | "
+				+ "PROBLEM INDEX | "
+				+ "EXECUTION TIME | "
+				+ "USED MEMORY | "
+				+ "VERDICT | "
+				+ "LINK\n";
 			
 			for( Submission sub : results.result ){
 				text +=
-					"[" + sub.getProblem().getName() + "] " + 
+					"[" + sub.getProblem().getName() + "]\t" + 
 					"[" + sub.getProblem().getIndex() + "] " +
 					"[" + sub.getTimeConsumedMillis() + "ms] " +
-					"[" + sub.getMemoryConsumedBytes() + "B] ";
+					"[" + sub.getMemoryConsumedBytes() + "B] " +
+					"[" + translateVerdict(sub.getVerdict()) + "] " +
+					"[" + ProblemsURL + sub.getContestId() + "/" + sub.getProblem().getIndex() + "]";
 				
 				// This is a good part to test out the database stuff to avoid 
 				// calling codeforces for info about the same contest many times.
@@ -253,6 +282,10 @@ public class Methods {
 				
 				text += "\n";
 			}
+			
+			
+			// DEBUG:
+			System.out.println(text);
 			
 			_submissions.put("text", text);
 			return _submissions;
