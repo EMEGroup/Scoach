@@ -72,7 +72,7 @@ public class Commands {
 		_sendMessage( _forgeMessage(requestProperties) );
 	}
 	
-	private void _sendMessage(Map<String,String> messageProperties){
+	public static void _sendMessage(Map<String,String> messageProperties){
 		if(messageProperties == null)	return;
 		
 		String message = "payload={";
@@ -105,7 +105,7 @@ public class Commands {
 		
 	}
 	
-	private Map<String, String> _forgeMessage(Map<String, List<String>> messageProperties){
+	public static  Map<String, String> _forgeMessage(Map<String, List<String>> messageProperties){
 		
 		Map<String, String> result = new HashMap<String, String>();
 		
@@ -151,7 +151,7 @@ public class Commands {
 		return result;
 	}
 	
-	private Map<String, List<String>> _getArguments(Map<String, List<String>> requestProperties){
+	public Map<String, List<String>> _getArguments(Map<String, List<String>> requestProperties){
 		Map<String, List<String>> args = new HashMap<String, List<String>>();
 		
 		String text = "";
@@ -183,5 +183,19 @@ public class Commands {
 		
 		return args;
 	}
+        
+      public static Map<String, List<String>> _copyMap(Map<String, List<String>> requestProperties){
+        Map<String, List<String>> tmpMap = new HashMap<>();
+        
+        Set<Map.Entry<String, List<String>>> entrySet = requestProperties.entrySet();
+	Iterator<Map.Entry<String, List<String>>> iterator = entrySet.iterator();
+		
+	while( iterator.hasNext() ){
+        Map.Entry<String, List<String>> next = iterator.next();
+            tmpMap.put(next.getKey(), next.getValue());
+        }
+        
+        return tmpMap;
+    }
 	
 }

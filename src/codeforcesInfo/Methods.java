@@ -225,8 +225,7 @@ public class Methods {
 				}
 			}
 			
-			// Sort
-			results.result.sort(null);
+
 			
 			String text = "";
 			
