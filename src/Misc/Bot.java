@@ -44,7 +44,7 @@ public class Bot {
 		String[] x = new String[1];
 		Map<String, String[]> h = new HashMap<String, String[]>();
 		
-		x[0] = "echo El chicharrón no es carne, es pellejo.";
+		x[0] = "submissions --by rioma_san --count 10";
 		h.put("text", x.clone());
 		
 		x[0] = "privategroup";
