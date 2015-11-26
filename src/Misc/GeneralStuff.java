@@ -13,33 +13,33 @@ import java.util.logging.Logger;
 
 public class GeneralStuff {
 	
-	public final static String APIToken = "xoxp-10522107940-10536035312-12886577955-3187f9ba9a"; // Change it !!
-	public final static String WebhookUrl = "https://hooks.slack.com/services/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";
-	public final static String SlackApiURL = "https://slack.com/api";
-	public final static String defaultChannel = "#scoachtest";
-	public final static Map<String, Command> commands;
+	public final static String APITOKEN = "xoxp-10522107940-10536035312-12886577955-3187f9ba9a"; // Change it !!
+	public final static String WEBHOOKURL = "https://hooks.slack.com/services/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";
+	public final static String SLACKAPIURL = "https://slack.com/api";
+	public final static String DEFAULTCHANNEL = "#scoachtest";
+	public final static Map<String, Command> COMMANDS;
 	
 	static {
 		final Commands C = new Commands();
 		
-		commands = new HashMap<String, Command>();
+		COMMANDS = new HashMap<String, Command>();
 		
-		commands.put("echo", new Command(){
+		COMMANDS.put("echo", new Command(){
 			@Override
 			public void execute(Map<String, List<String>> req){ C.echo(req); }
 		});
 		
-		commands.put("submissions", new Command(){
+		COMMANDS.put("submissions", new Command(){
 			@Override
 			public void execute(Map<String, List<String>> req){ C.submissions(req); }
 		});
 		
-		commands.put("help", new Command(){
+		COMMANDS.put("help", new Command(){
 			@Override
 			public void execute(Map<String, List<String>> req){ C.help(req); }
 		});
         
-		commands.put("student", new Command(){
+		COMMANDS.put("student", new Command(){
 			@Override
 			public void execute(Map<String, List<String>> req){ 
 				try {
@@ -66,9 +66,9 @@ public class GeneralStuff {
 		HttpRequest req;
 			
 		if(privateGroup)
-			req = new HttpRequest(	SlackApiURL+"/groups.info?token="+APIToken+"&channel="+channelId);
+			req = new HttpRequest(	SLACKAPIURL+"/groups.info?token="+APITOKEN+"&channel="+channelId);
 		else
-			req = new HttpRequest(	SlackApiURL+"/channels.info?token="+APIToken+"&channel="+channelId);
+			req = new HttpRequest(	SLACKAPIURL+"/channels.info?token="+APITOKEN+"&channel="+channelId);
 		req.startConnection();
 		
 		String channel_name = "";
@@ -98,7 +98,7 @@ public class GeneralStuff {
 		return channel_name;
 	}
 	public static String getUserInfo(String channelId){
-		HttpRequest req = new HttpRequest(	SlackApiURL+"/users.info?token="+APIToken+"&user="+channelId);
+		HttpRequest req = new HttpRequest(	SLACKAPIURL+"/users.info?token="+APITOKEN+"&user="+channelId);
 		req.startConnection();
 		
 		String user_name = "";
@@ -120,7 +120,27 @@ public class GeneralStuff {
 		req.getConnection().disconnect();
 		return user_name;
 	}
+	public static <T> T getResponseObject(String url, Class<T> responseClass){
+		HttpRequest conn;
+		JsonReader jr;
+		Gson g;
+		T responseObject = null;
+		
+		conn = new HttpRequest(url);
+		conn.startConnection();
+		
+		g = new Gson();
+		try {
+			jr = new JsonReader(new InputStreamReader(conn.getInputStream()));
+			responseObject = g.fromJson(jr, responseClass);
+		} catch (IOException ex) {
+			Logger.getLogger(GeneralStuff.class.getName()).log(Level.SEVERE, null, ex);
+		}
+		
+		conn.disconnect();
 	
+		return responseObject;
+	} 
 	
 	class ChannelInfo{
 		public String status = "";
