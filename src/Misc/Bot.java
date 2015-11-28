@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Bot {
 	
@@ -12,7 +14,7 @@ public class Bot {
 		TEST();
 	}
 	
-	public static void work(Map<String, String[]> requestProperties){
+	public static void work(Map<String, String[]> requestProperties) throws InterruptedException{
 		
 		if(requestProperties.get("text") == null)
 			return;
@@ -30,9 +32,23 @@ public class Bot {
 		reqProperties.get("text").set(0,
 			reqProperties.get("text").get(0).replaceFirst(command+"[ \t]*", ""));
 		command = command.toLowerCase();
+                UserInteraction instancia = new UserInteraction();
+                instancia.prepareInfo(reqProperties);
+                Thread t1 = new Thread(instancia);
+                  
 		
-		if(GeneralStuff.commands.get(command) != null)
-			GeneralStuff.commands.get(command).execute(reqProperties);
+		if(GeneralStuff.commands.get(command) != null){
+                    t1.start();
+                    try{
+                        GeneralStuff.commands.get(command).execute(reqProperties);
+                    }catch(Exception e){
+                        instancia.notifyError();
+                    }
+                    finally{
+                        instancia.killThread();
+                        t1.join();
+                    }
+                }
 		else
 			GeneralStuff.commands.get("help").execute(reqProperties);
 	}
@@ -44,16 +60,20 @@ public class Bot {
 		String[] x = new String[1];
 		Map<String, String[]> h = new HashMap<String, String[]>();
 		
-		x[0] = "submissions --by mamelui --verdict AC --since 1y";
+		x[0] = "submissions --by kojak_";
 		h.put("text", x.clone());
 		
-		x[0] = "scoachcan";
+		x[0] = "privategroup";
 		h.put("channel_name", x.clone());
 		
-		x[0] = "C0AFK0UJD";
+		x[0] = "C0D50765C";
 		h.put("channel_id", x.clone());
 		
-		work(h);
+            try {
+                work(h);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(Bot.class.getName()).log(Level.SEVERE, null, ex);
+            }
 	}
 	
 }
