@@ -15,7 +15,6 @@ public class Bot {
 	}
 	
 	public static void work(Map<String, String[]> requestProperties) throws InterruptedException{
-		
 		if(requestProperties.get("text") == null)
 			return;
 		
@@ -35,9 +34,14 @@ public class Bot {
                 UserInteraction instancia = new UserInteraction();
                 instancia.prepareInfo(reqProperties);
                 Thread t1 = new Thread(instancia);
+                
                   
 		
 		if(GeneralStuff.commands.get(command) != null){
+                    //Imprimir mensaje de comando aceptado desde el hilo principal.
+                    Map<String, List<String>> startMessage = Commands._copyMap(reqProperties);
+                    startMessage.put("text",Arrays.asList(new String[] {"Your request has been processed."}));
+                    Commands._sendMessage(Commands._forgeMessage(startMessage));
                     t1.start();
                     try{
                         GeneralStuff.commands.get(command).execute(reqProperties);
@@ -45,8 +49,9 @@ public class Bot {
                         instancia.notifyError();
                     }
                     finally{
+                        System.out.println("Thread apuento de terminar : " + System.currentTimeMillis());
                         instancia.killThread();
-                        t1.join();
+                        t1.interrupt();
                     }
                 }
 		else
