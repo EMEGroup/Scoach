@@ -15,7 +15,6 @@ import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 
 /**
- *
  * @author Ernesto
  */
 public class StudentInfo extends GeneralBehavior {
