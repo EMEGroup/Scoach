@@ -96,9 +96,9 @@ public class Commands {
 		
 		if(messageProperties.containsKey("queryString"))
 			conn = new HttpRequest(
-				GeneralStuff.WebhookUrl + messageProperties.get("queryString"));
+				GeneralStuff.WEBHOOKURL + messageProperties.get("queryString"));
 		else
-			conn = new HttpRequest(GeneralStuff.WebhookUrl);
+			conn = new HttpRequest(GeneralStuff.WEBHOOKURL);
 		conn.startConnection();
 		conn.write(message);
 		conn.disconnect();
@@ -143,7 +143,7 @@ public class Commands {
 		}
 		
 		if( channel.isEmpty() ){
-			channel = GeneralStuff.defaultChannel;
+			channel = GeneralStuff.DEFAULTCHANNEL;
 		}
 		
 		result.put("channel", channel);
@@ -162,7 +162,7 @@ public class Commands {
 			}
 		}
 		
-		Pattern argPat = Pattern.compile("--[^-]+");
+		Pattern argPat = Pattern.compile("-{2}((?!-{2}).)+");
 		Matcher argsMatcher = argPat.matcher(text);
 		
 		String argument, key;
@@ -172,11 +172,14 @@ public class Commands {
 			argument = argsMatcher.group();
 			argument = argument.trim();
 			
-			if( !argument.contains(" ") )	continue;
-			
-			key = argument.substring(2, argument.indexOf(" "));
-			values = argument.replaceFirst("--"+key+"[ ]+", "").split(
+			if( !argument.contains(" ") ){
+				key = argument.substring(2, argument.length());
+				values = new String[]{""};
+			}else{
+				key = argument.substring(2, argument.indexOf(" "));
+				values = argument.replaceFirst("--"+key+"[ ]+", "").split(
 					"([ ]*[,]+[ ]*)+");
+			}
 			
 			args.put(key, Arrays.asList(values));
 		}

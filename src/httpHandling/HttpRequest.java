@@ -54,7 +54,10 @@ public class HttpRequest {
 	}
 	
 	public InputStream getInputStream() throws IOException {
-		return this.connection.getInputStream();
+		if(connection.getResponseCode() != 200)
+			return this.connection.getErrorStream();
+		else
+			return this.connection.getInputStream();
 	}
 	
 	public int write(String message){
