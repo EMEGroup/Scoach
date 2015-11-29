@@ -12,7 +12,7 @@ import java.util.Map;
 
     public class UserInteraction implements Runnable{
     private final String meanwhileMessage = "Please wait...";
-    private final String errorMessage = "An error has occourred, maybe the user doesn't exist or you lost connection.";
+    private final String errorMessage = "An error has occourred.";
     private final String doneMessage = "Finished.";
     private String canal;
     private boolean alive = true;
