@@ -43,10 +43,16 @@ import java.util.Map;
     public void run(){
         long LastMessage = System.currentTimeMillis();
         while(alive && !(Thread.interrupted())){
-           if(System.currentTimeMillis() - LastMessage > 5000){
-                LastMessage = System.currentTimeMillis();
-                requestPropertiesGlobal.put("text",Arrays.asList(new String[] {meanwhileMessage}));
-                Commands._sendMessage(Commands._forgeMessage(requestPropertiesGlobal));
+            if(!alive){
+                break;
+            }
+           if(System.currentTimeMillis() - LastMessage > 5000 && alive && !(Thread.interrupted())){
+               if(!alive){
+                   break;
+               }
+               LastMessage = System.currentTimeMillis();
+               requestPropertiesGlobal.put("text",Arrays.asList(new String[] {meanwhileMessage}));
+               Commands._sendMessage(Commands._forgeMessage(requestPropertiesGlobal));
                
            }
         }
