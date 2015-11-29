@@ -23,7 +23,13 @@ import java.util.Map;
         //Implementar la interaccion con el usuario en un hilo que va con el comando principal.
         boolean private_group;
         requestPropertiesGlobal = Commands._copyMap(requestProperties);
-        private_group = requestProperties.get("channel_name").get(0).equals("privategroup");
+        if(requestProperties.get("channel_name") != null){
+            private_group = requestProperties.get("channel_name").get(0).equals("privategroup");
+        }
+        else{
+            private_group = false;
+        }
+        
         if(requestProperties.get("channel_id") != null){
            canal = requestProperties.get("channel_id").get(0);
            canal = GeneralStuff.getChannelInfo(canal, private_group);
