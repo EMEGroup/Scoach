@@ -49,7 +49,6 @@ public class Bot {
                         instancia.notifyError();
                     }
                     finally{
-                        System.out.println("Thread apuento de terminar : " + System.currentTimeMillis());
                         instancia.killThread();
                         t1.interrupt();
                     }
@@ -65,7 +64,7 @@ public class Bot {
 		String[] x = new String[1];
 		Map<String, String[]> h = new HashMap<String, String[]>();
 		
-		x[0] = "submissions --by kojak_";
+		x[0] = "echo el chicharron no es carne, es cuero";
 		h.put("text", x.clone());
 		
 		x[0] = "privategroup";

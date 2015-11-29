@@ -24,8 +24,13 @@ import java.util.Map;
         boolean private_group;
         requestPropertiesGlobal = Commands._copyMap(requestProperties);
         private_group = requestProperties.get("channel_name").get(0).equals("privategroup");
-        canal = requestProperties.get("channel_id").get(0);
-        canal = GeneralStuff.getChannelInfo(canal, private_group);
+        if(requestProperties.get("channel_id") != null){
+           canal = requestProperties.get("channel_id").get(0);
+           canal = GeneralStuff.getChannelInfo(canal, private_group);
+        }
+        else{
+            canal = GeneralStuff.defaultChannel;
+        }
     }
     
     @Override
