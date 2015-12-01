@@ -1,8 +1,11 @@
 package codeforcesInfo;
 
-import Misc.GeneralStuff;
+import com.google.gson.Gson;
+import com.google.gson.stream.JsonReader;
+import httpHandling.HttpRequest;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -64,26 +67,29 @@ public class Methods {
 		OUT_OF_COMPETITION
 	}
 	
-	private static final String CODEFORCESURL;
-	private static final String METHODSURL;
-	private static final String PROBLEMSURL;
+	private static final String CodeforcesURL;
+	private static final String MethodsUrl;
+	private static final String ProblemsURL;
 	
 	static{
-		CODEFORCESURL = "https://codeforces.com/";
-		METHODSURL = CODEFORCESURL + "api/";
-		PROBLEMSURL = CODEFORCESURL + "problemset/problem/";
+		CodeforcesURL = "https://codeforces.com/";
+		MethodsUrl = CodeforcesURL + "api/";
+		ProblemsURL = CodeforcesURL + "problemset/problem/";
 	}
 	
 	private class defaultResponse{
 		public String status = "";
 		public String comment = "";
 	}
+	
 	private class contest_hacks extends defaultResponse{
 		public List<Hack> result;
 	}
+	
 	private class contest_list extends defaultResponse{
 		public List<Contest> result;
 	}
+	
 	private class contest_standings extends defaultResponse{
 		public Standings result;
 		
@@ -93,9 +99,11 @@ public class Methods {
 			public List<RanklistRow> rows;
 		}
 	}
+	
 	private class contest_status extends defaultResponse{
 		public List<Submission> result;
 	}
+	
 	private class problemset_problems extends defaultResponse{
 		public ProblemsInfo result;
 		
@@ -104,18 +112,23 @@ public class Methods {
 			public List<ProblemStatistics> problemStatistics;
 		}
 	}
+	
 	private class problemset_recentstatus extends defaultResponse{
 		public List<Submission> result;
 	}
+	
 	private class user_info extends defaultResponse{
 		public List<User> result;
 	}
+	
 	private class user_ratedlist extends defaultResponse{
 		public List<User> result;
 	}
+	
 	private class user_rating extends defaultResponse{
 		public List<RatingChange> result;
-	}	
+	}
+	
 	private class user_status extends defaultResponse{
 		public List<Submission> result;
 	}
@@ -145,280 +158,210 @@ public class Methods {
 		}
 	}
 	
-	private static String translateVerdict( ProblemVerdict verdict){
-		if(verdict == null)	return null;
+	public static Map<String, String> getSubmissions(String handle, 
+		Long startingTime, int count, String verdict, List<String> tags){
 		
-		if(verdict == ProblemVerdict.OK)
-			return "AC";
-		if(verdict == ProblemVerdict.WRONG_ANSWER)
-			return "WA";
-		if(verdict == ProblemVerdict.TIME_LIMIT_EXCEEDED)
-			return "TLE";
-		if(verdict == ProblemVerdict.MEMORY_LIMIT_EXCEEDED)
-			return "MLE";
-		if(verdict == ProblemVerdict.COMPILATION_ERROR)
-			return "CE";
-		if(verdict == ProblemVerdict.RUNTIME_ERROR)
-			return "RTE";
-		if(verdict == ProblemVerdict.PRESENTATION_ERROR)
-			return "PE";
-		if(verdict == ProblemVerdict.CHALLENGED)
-			return "HACKED";
+		if(handle == null || handle.isEmpty())	return null;
+		
+		count = Math.min( Math.abs(count), 1000 );
+		if(tags == null)	tags = new ArrayList<String>();
+		if(startingTime != null)
+			startingTime = Math.abs(startingTime);
+		
+		Integer startingID = null;
+		
+		Map<String, String> _submissions = new HashMap<String, String>();
+		
+		// Do a binary search 
+		if(startingTime != null){
+			startingID = Math.max(binarySearch(handle, count, startingTime), 1);
+		}
+		
+		httpHandling.HttpRequest conn;
+		
+		if(startingTime != null){
+			conn = new HttpRequest(MethodsUrl + "user.status?" + 
+				"handle=" + handle + "&count=" + count +
+				"&from=" + startingID);
+		}
+		else{
+			conn = new HttpRequest(MethodsUrl + "user.status?" + 
+				"handle=" + handle + "&count=" + count);
+		}
+		
+		conn.startConnection();
+		
+		try {
+			Gson g = new Gson();
+			JsonReader j = new JsonReader(
+				new InputStreamReader(conn.getInputStream()) );
+			
+			user_status results = g.fromJson(j, user_status.class);
+			
+			// filter
+			for(int i = 0; i < results.result.size(); i++){
+				
+				// check for verdict
+				if(verdict != null){
+					if(results.result.get(i).getVerdict() != translateVerdict(verdict)){
+						results.result.remove(i);
+						i--;
+						continue;
+					}
+				}
+				// check for creation time
+				if(startingTime != null){
+					if(results.result.get(i).getCreationTimeSeconds() < startingTime){
+						results.result.remove(i);
+						i--;
+						continue;
+					}
+				}
+				
+				// check for tags
+				if( !results.result.get(i).getProblem().getTags().containsAll(tags) ){
+					results.result.remove(i);
+					i--;
+				}
+			}
+			
+
+			
+			String text = "";
+			
+			for( Submission sub : results.result ){
+				text +=
+					"[" + sub.getProblem().getName() + "] " + 
+					"[" + sub.getProblem().getIndex() + "] " +
+					"[" + sub.getTimeConsumedMillis() + "ms] " +
+					"[" + sub.getMemoryConsumedBytes() + "B] ";
+				
+				// This is a good part to test out the database stuff to avoid 
+				// calling codeforces for info about the same contest many times.
+				httpHandling.HttpRequest conn2 = new HttpRequest(
+					MethodsUrl + "contest.standings?" +
+						"contestId="+sub.getContestId() +
+						"&from=1&count=1");
+				conn2.startConnection();
+				
+				JsonReader j2 = new JsonReader(
+					new InputStreamReader(conn2.getInputStream()));
+				contest_standings result = g.fromJson(j2, contest_standings.class);
+				
+				if(result.result.contest.getWebsiteUrl() != null)
+					text += "[" + result.result.contest.getWebsiteUrl() + "]";
+				
+				text += "\n";
+			}
+			
+			_submissions.put("text", text);
+			return _submissions;
+			
+		} catch (IOException ex) {
+			Logger.getLogger(Methods.class.getName()).log(Level.SEVERE, null, ex);
+		}
 		
 		return null;
 	}
 	
-	public static Map<String, String> getSubmissions(String handle, 
-		Long startingTime, Integer count, String verdict, List<String> tags){
+	private static int binarySearch(String handle, int count, long secondsBack){
 		
-		int bufferStep = 1000;	// How many submissions to query every request
-		String submissionsUrl;
-		Map<String, String> returnObject;
-		List<Submission> submissionsInRange = new ArrayList<Submission>();
-		returnObject = new HashMap<String, String>();
-		
-		if(handle == null || handle.isEmpty())	return null;
-		if(count != null && count <= 0)	return null;	// count >= 1 is ok
-		
-		if(verdict != null)
-			verdict = verdict.toUpperCase();
-		
-		submissionsUrl = METHODSURL + "user.status?" + 	"handle=" + handle;
-		
-		// Check if the verdict is a valid one
-		if( verdict != null && translateVerdict(verdict) == null ){
-			returnObject.put("text", 
-				"The passed VERDICT does not exist in codeforces or is not valid.");
-			return returnObject;
-		}
-		
-		// Test with a request to codeforces, validating handle and stuff
-		user_status test = 
-			GeneralStuff.getResponseObject(submissionsUrl, user_status.class);
-		
-		// A problem ocurred with the last request
-		if( test.status.equals("OK") == false ){
-			String comment = test.comment;
-			String cause = comment.split("[^a-zA-Z]")[0];
+		try {
+			HttpRequest conn;
+			Gson g = new Gson();
+			JsonReader j;
+			user_status lastSubmission;
 			
-			if( cause.equals("handle") ){
-				returnObject.put("text", 
-					"The passed handle/nickname does not exist in codeforces.");
-				return returnObject;
-			}
-		}
-		
-		if(tags == null)	
-			tags = new ArrayList<String>();
-		
-		if(startingTime != null){
-			startingTime = Math.abs(startingTime);
-		}
-		
-		// Go fetching submissions chunks of 1000 submissions each to get all
-		// submissions from a user since the time specified by the caller
-		if(startingTime != null){
-			user_status tmpSubmissions;
-			int startingId = 1;
+			int id = 1;
+			long lastTime = System.currentTimeMillis()/1000 - secondsBack;
 			
 			while(true){
+				conn = new HttpRequest(MethodsUrl+"user.status?"+
+					"handle=" + handle + "&count=1000&from=" + id);
+				conn.startConnection();
 				
-				tmpSubmissions = GeneralStuff.getResponseObject(
-					submissionsUrl + "&count=" + bufferStep + "&from=" + startingId, 
-					user_status.class);
+				j = new JsonReader(new InputStreamReader(conn.getInputStream()));
+				lastSubmission = g.fromJson(j, user_status.class);
 				
-				while(tmpSubmissions.status.equals("FAILED") && 
-					tmpSubmissions.comment.equals("Call limit exceeded")){
+				if(lastSubmission.status.equals("FAILED") && lastSubmission.comment.equals("Call limit exceeded")){
+					Thread.sleep(1000);
 					
-					try {
-						Thread.sleep(250);
-					} catch (InterruptedException ex) {
-						Logger.getLogger(Methods.class.getName()).log(Level.SEVERE, null, ex);
-					}
-					
-					tmpSubmissions = GeneralStuff.getResponseObject(
-						submissionsUrl + "&count=" + bufferStep + "&from=" + startingId, 
-						user_status.class);
+					conn = new HttpRequest(MethodsUrl+"user.status?"+
+						"handle=" + handle + "&count=1000&from=" + id);
+					conn.startConnection();
+
+					j = new JsonReader(new InputStreamReader(conn.getInputStream()));
+					lastSubmission = g.fromJson(j, user_status.class);
 				}
 				
-				// There's no more submissions
-				if(tmpSubmissions.result.isEmpty()){
+				conn.disconnect();
+				
+				if(lastSubmission.result.size() <= 0){
+					id -= 1000;
 					break;
-				}else{
-					submissionsInRange.addAll( tmpSubmissions.result );
 				}
 				
-				startingId = submissionsInRange.size()+1;
+				id += lastSubmission.result.size();
 				
-				if(tmpSubmissions.result.get(tmpSubmissions.result.size()-1).getCreationTimeSeconds() < startingTime )
+				if(lastSubmission.result.get( lastSubmission.result.size()-1).getCreationTimeSeconds() < lastTime )
 					break;
 			}
+			
+			return _binarySearch(handle, count, lastTime, 1, id);
+			
+		} catch (IOException ex) {
+			Logger.getLogger(Methods.class.getName()).log(Level.SEVERE, null, ex);
+			// Handle bad usernames and stuff alike
+		} catch (InterruptedException ex) {
+			Logger.getLogger(Methods.class.getName()).log(Level.SEVERE, null, ex);
 		}
-		// If no starting time set by the user then fetch everything at once
+		
+		return 1;
+	}
+	
+	private static int _binarySearch(String handle, int count, long from, int l, int r) throws IOException, InterruptedException{
+		
+		if(l >= r)
+			return r - count;
+		
+		int mid = (l + r) / 2;
+		
+		//
+		HttpRequest conn;
+		Gson g;
+		JsonReader j;
+		user_status sub;
+		
+		conn = new HttpRequest(MethodsUrl + "user.status?handle=" + handle + "&count=" + count +"&from=" + mid);
+		conn.startConnection();
+		g = new Gson();
+		j = new JsonReader(new InputStreamReader(conn.getInputStream()));
+		sub = g.fromJson(j, user_status.class);
+		
+		if(sub.status.equals("FAILED") && sub.comment.equals("Call limit exceeded")){
+			Thread.sleep(1000);
+			System.out.println("DELAY");
+			
+			conn = new HttpRequest(MethodsUrl + "user.status?handle=" + handle + "&count=" + count +"&from=" + mid);
+			conn.startConnection();
+			g = new Gson();
+			j = new JsonReader(new InputStreamReader(conn.getInputStream()));
+			sub = g.fromJson(j, user_status.class);
+		}
+		
+		if(sub.result == null || sub.result.size() <= 0){
+			return _binarySearch(handle, count, from, l, mid-1);
+		}
+		
+		long tmp = sub.result.get( 0 ).getCreationTimeSeconds();
+		//
+		
+		if(tmp < from){
+			return _binarySearch(handle, count, from, l, mid-1);
+		}
 		else{
-			user_status tmpSubmissions;
-			int bufferCount = (count == null) ? bufferStep : 
-				Math.max(bufferStep, count);
-			int startingId = 1;
-			
-			while(true){
-				
-				if( count != null ){
-					if(startingId >= count) break;
-				}
-				
-				tmpSubmissions = GeneralStuff.getResponseObject(
-					submissionsUrl + "&count=" + bufferCount +
-					"&from=" + startingId, 
-					user_status.class);
-				
-				while(tmpSubmissions.status.equals("FAILED") && 
-					tmpSubmissions.comment.equals("Call limit exceeded")){
-					
-					try {
-						Thread.sleep(250);
-					} catch (InterruptedException ex) {
-						Logger.getLogger(Methods.class.getName()).log(Level.SEVERE, null, ex);
-					}
-					
-					tmpSubmissions = GeneralStuff.getResponseObject(
-						submissionsUrl + "&count=" + bufferCount +
-						"&from=" + startingId, 
-						user_status.class);
-				}
-				
-				submissionsInRange.addAll(tmpSubmissions.result);
-				
-				// There's no more submissions 
-				if(tmpSubmissions.result.isEmpty())	break;
-				
-				startingId += tmpSubmissions.result.size();
-				bufferCount = (count == null) ? bufferStep : 
-					Math.min(bufferStep, count - startingId + 1);
-				
-				// This is the rest of submissions, no more to be found.
-				if(tmpSubmissions.result.size() < bufferStep)	break;
-			}
+			return _binarySearch(handle, count, from, mid+1, r);
 		}
 		
-		// Sort based on the Submission.compareTo method.
-		// The submissions will be arranged from oldest to newest
-		submissionsInRange.sort(null);
-		
-		if(startingTime != null){
-			// Find the very first submission within the time range
-			int firstIndex = 0;
-			
-			Comparator<Submission> comparator = new Comparator<Submission>() {
-				@Override
-				public int compare(Submission t, Submission t1) {
-					if( t.getCreationTimeSeconds() < t1.getCreationTimeSeconds())
-						return -1;
-					else if(t.getCreationTimeSeconds() == t1.getCreationTimeSeconds())
-						return 0;
-					else
-						return 1;
-				}
-			};
-			
-			if( submissionsInRange.isEmpty() == false ){
-				Submission fakeSubmissionStoringTime;
-				
-				fakeSubmissionStoringTime = submissionsInRange.get(0);
-				fakeSubmissionStoringTime.setCreationTimeSeconds(startingTime);
-				
-				firstIndex = 
-					_lowerBound(submissionsInRange, fakeSubmissionStoringTime,
-					comparator);
-			}
-			
-			// Get rid of the submissions laying outside of the time range
-			submissionsInRange = submissionsInRange.subList(
-				firstIndex, submissionsInRange.size());
-		}
-		
-		// Filter by verdict, tags, etc ...
-		for(int i = 0; i < submissionsInRange.size(); ){
-			
-			// Check for verdict
-			if(verdict != null){
-				if(submissionsInRange.get(i).getVerdict() != translateVerdict(verdict)){
-					submissionsInRange.remove(i);
-					continue;
-				}
-			}
-
-			// Check for tags
-			if( !submissionsInRange.get(i).getProblem().getTags().containsAll(tags) ){
-				submissionsInRange.remove(i);
-				continue;
-			}
-			
-			i++;
-		}
-		
-		// Just work over the last <count> submissions, since those are the 
-		// required by the caller and reverse their order so the oldest one is
-		// at the beginning of the list, omit if --all was passed (count == null)
-		
-		if( count != null ){
-			submissionsInRange = submissionsInRange.subList(
-				0, Math.max(0, Math.min(submissionsInRange.size(), count)));
-		}
-		
-		String text = "";
-		
-		// Assemble the response message if there are submissions to return ...
-		if( submissionsInRange.isEmpty() == false ){
-			String columnIDs = "ID | " +"PROBLEM NAME | " + "PROBLEM INDEX | " 
-				+ "EXECUTION TIME | " + "USED MEMORY | " + "VERDICT | " + "LINK\n";
-
-			for( int i = 0; i < submissionsInRange.size(); i++){
-				Submission sub = submissionsInRange.get(i);
-				
-				columnIDs +=
-					"[" + (i+1) + "]  " +
-					"[" + sub.getProblem().getName() + "]\t" + 
-					"[" + sub.getProblem().getIndex() + "] " +
-					"[" + sub.getTimeConsumedMillis() + "ms] " +
-					"[" + sub.getMemoryConsumedBytes() + "B] " +
-					"[" + translateVerdict(sub.getVerdict()) + "] " +
-					"[" + PROBLEMSURL + sub.getContestId() + "/" + sub.getProblem().getIndex() + "]";
-
-				columnIDs += "\n";
-			}
-			
-			text += columnIDs;
-			text += "END OF LIST.";
-		}
-
-		returnObject.put("text", text);
-		return returnObject;
 	}
-	
-	private static <T> int _lowerBound(List<T> arr, T val, Comparator<T> comparator){
-		return _lowerBound(arr, 0, arr.size()-1, val, comparator);
-	}
-	
-	private static <T> int _lowerBound(List<T> arr, int firstIndex, int lastIndex, T val, Comparator<T> comparator){
-		
-		int distance = lastIndex - firstIndex;
-		int step, mid;
-		
-		while(distance > 0){
-			step = distance / 2;
-			mid = firstIndex + step;
-			
-			if( comparator.compare(arr.get(mid), val) < 0 ){
-				firstIndex = mid+1;
-				distance -= step+1;
-			}
-			else{
-				distance = step;
-			}
-		}
-		
-		return firstIndex;
-	}
-	
 }

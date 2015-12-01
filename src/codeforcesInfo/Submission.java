@@ -106,9 +106,9 @@ public class Submission implements Comparable<Submission>{
 
 	@Override
 	public int compareTo(Submission t) {
-		if(this.id < t.id)
+		if(this.creationTimeSeconds < t.creationTimeSeconds)
 			return -1;
-		else if(this.id == t.id)
+		else if(this.creationTimeSeconds == t.creationTimeSeconds)
 			return 0;
 		else
 			return 1;
