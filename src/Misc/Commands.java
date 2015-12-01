@@ -61,12 +61,14 @@ public class Commands {
 		StudentInfo _studentInfo= new StudentInfo();
                 
 		Map<String, String> result = 
-			_studentInfo.Run(requestProperties);
+			_studentInfo.Run( _getArguments(requestProperties));
+		
 		
 		if(result == null) 
 			return;
 		
 		String text= result.get("text");
+                System.out.println(text);
 		requestProperties.put("text", Arrays.asList(new String[]{text}));
 		
 		_sendMessage( _forgeMessage(requestProperties) );
@@ -96,9 +98,9 @@ public class Commands {
 		
 		if(messageProperties.containsKey("queryString"))
 			conn = new HttpRequest(
-				GeneralStuff.WEBHOOKURL + messageProperties.get("queryString"));
+				GeneralStuff.WebhookUrl + messageProperties.get("queryString"));
 		else
-			conn = new HttpRequest(GeneralStuff.WEBHOOKURL);
+			conn = new HttpRequest(GeneralStuff.WebhookUrl);
 		conn.startConnection();
 		conn.write(message);
 		conn.disconnect();
@@ -143,7 +145,7 @@ public class Commands {
 		}
 		
 		if( channel.isEmpty() ){
-			channel = GeneralStuff.DEFAULTCHANNEL;
+			channel = GeneralStuff.defaultChannel;
 		}
 		
 		result.put("channel", channel);
@@ -158,11 +160,12 @@ public class Commands {
 		
 		if(requestProperties.get("text") != null){
 			if(requestProperties.get("text").get(0) != null){
+                            
 				text = requestProperties.get("text").get(0);
 			}
 		}
 		
-		Pattern argPat = Pattern.compile("-{2}((?!-{2}).)+");
+		Pattern argPat = Pattern.compile("--[^-]+");
 		Matcher argsMatcher = argPat.matcher(text);
 		
 		String argument, key;
@@ -172,14 +175,11 @@ public class Commands {
 			argument = argsMatcher.group();
 			argument = argument.trim();
 			
-			if( !argument.contains(" ") ){
-				key = argument.substring(2, argument.length());
-				values = new String[]{""};
-			}else{
-				key = argument.substring(2, argument.indexOf(" "));
-				values = argument.replaceFirst("--"+key+"[ ]+", "").split(
+			if( !argument.contains(" ") )	continue;
+			
+			key = argument.substring(2, argument.indexOf(" "));
+			values = argument.replaceFirst("--"+key+"[ ]+", "").split(
 					"([ ]*[,]+[ ]*)+");
-			}
 			
 			args.put(key, Arrays.asList(values));
 		}
