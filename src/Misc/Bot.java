@@ -46,6 +46,7 @@ public class Bot {
 			finally{
 				instancia.killThread();
 				t1.join();
+                                
 			}
 		}
 		else

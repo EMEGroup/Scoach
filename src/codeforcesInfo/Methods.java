@@ -2,6 +2,7 @@ package codeforcesInfo;
 
 import Misc.GeneralStuff;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -304,7 +305,7 @@ public class Methods {
 		
 		// Sort based on the Submission.compareTo method.
 		// The submissions will be arranged from oldest to newest
-		submissionsInRange.sort(null);
+		Collections.sort(submissionsInRange);
 		
 		if(startingTime != null){
 			// Find the very first submission within the time range

@@ -10,7 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-    public class UserInteraction implements Runnable{
+public class UserInteraction implements Runnable{
     private final String meanwhileMessage = "Please wait...";
     private final String errorMessage = "An error has occourred.";
     private final String doneMessage = "Finished.";
@@ -22,7 +22,7 @@ import java.util.Map;
     public void prepareInfo(Map<String, List<String>> requestProperties) {
         //Implementar la interaccion con el usuario en un hilo que va con el comando principal.
         boolean private_group;
-        requestPropertiesGlobal = Commands._copyMap(requestProperties);
+        requestPropertiesGlobal = GeneralStuff._copyMap(requestProperties);
         if(requestProperties.get("channel_name") != null){
             private_group = requestProperties.get("channel_name").get(0).equals("privategroup");
         }
@@ -35,7 +35,7 @@ import java.util.Map;
            canal = GeneralStuff.getChannelInfo(canal, private_group);
         }
         else{
-            canal = GeneralStuff.defaultChannel;
+            canal = GeneralStuff.DEFAULTCHANNEL;
         }
     }
     
@@ -52,17 +52,17 @@ import java.util.Map;
                }
                LastMessage = System.currentTimeMillis();
                requestPropertiesGlobal.put("text",Arrays.asList(new String[] {meanwhileMessage}));
-               Commands._sendMessage(Commands._forgeMessage(requestPropertiesGlobal));
+               GeneralStuff._sendMessage(GeneralStuff._forgeMessage(requestPropertiesGlobal));
                
            }
         }
         if(error){
                requestPropertiesGlobal.put("text",Arrays.asList(new String[] {errorMessage}));
-               Commands._sendMessage(Commands._forgeMessage(requestPropertiesGlobal));
+               GeneralStuff._sendMessage(GeneralStuff._forgeMessage(requestPropertiesGlobal));
            }
         else{
                 requestPropertiesGlobal.put("text",Arrays.asList(new String[] {doneMessage}));
-                Commands._sendMessage(Commands._forgeMessage(requestPropertiesGlobal));
+                GeneralStuff._sendMessage(GeneralStuff._forgeMessage(requestPropertiesGlobal));
         }
         return;
     }
