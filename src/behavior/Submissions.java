@@ -27,8 +27,8 @@ public class Submissions extends GeneralBehavior{
 		
 		Map<String, String> responseProperties;
 		
-		if(requestProperties.get("by") != null){
-			handle = requestProperties.get("by").get(0);
+		if(requestProperties.get("--by") != null){
+			handle = requestProperties.get("--by").get(0);
 		}
 		else{
 			responseProperties = new HashMap<String, String>();
@@ -36,21 +36,21 @@ public class Submissions extends GeneralBehavior{
 			return responseProperties;
 		}
 		
-		if(requestProperties.get("verdict") != null){
-			verdict = requestProperties.get("verdict").get(0);
+		if(requestProperties.get("--verdict") != null){
+			verdict = requestProperties.get("--verdict").get(0);
 		}
 		
-		if(requestProperties.get("show") != null){
-			if( !requestProperties.get("show").get(0).isEmpty() )
-				show = Integer.parseInt(requestProperties.get("show").get(0));
+		if(requestProperties.get("--show") != null){
+			if( !requestProperties.get("--show").get(0).isEmpty() )
+				show = Integer.parseInt(requestProperties.get("--show").get(0));
 		}
 		
-		if(requestProperties.get("all") != null){
+		if(requestProperties.get("--all") != null){
 			show = null;
 		}
 		
-		if(requestProperties.get("since") != null){
-			time = requestProperties.get("since").get(0);
+		if(requestProperties.get("--since") != null){
+			time = requestProperties.get("--since").get(0);
 			from = Long.parseLong( time.substring(0, time.length()-1) );
 			
 			switch( Character.toLowerCase( time.charAt(time.length()-1) ) ){
@@ -76,17 +76,17 @@ public class Submissions extends GeneralBehavior{
 		
 		responseProperties = 
 			codeforcesInfo.Methods.getSubmissions(handle, from, show, verdict, 
-			requestProperties.get("tags"));
+			requestProperties.get("--tags"));
 		
 		String banner = "Submissions of " + handle;
 		if(verdict != null)	banner += ", with verdict of " + verdict;
 		if(time != null) banner += ", from " + time + " ago";
-		if(requestProperties.get("tags") != null && requestProperties.get("tags").isEmpty() == false){
+		if(requestProperties.get("--tags") != null && requestProperties.get("--tags").isEmpty() == false){
 			banner += ", with tags of ";
 			
-			for(int i = 0; i < requestProperties.get("tags").size(); i++){
-				banner += requestProperties.get("tags").get(i);
-				if( i < requestProperties.get("tags").size() - 1 )
+			for(int i = 0; i < requestProperties.get("--tags").size(); i++){
+				banner += requestProperties.get("--tags").get(i);
+				if( i < requestProperties.get("--tags").size() - 1 )
 					banner += ", ";
 			}
 		}

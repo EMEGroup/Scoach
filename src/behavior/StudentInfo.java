@@ -38,8 +38,8 @@ public class StudentInfo extends GeneralBehavior {
 
         List<String> students = new ArrayList<>();
 //----------------------------------------------------------------------------
-        if (requestProperties.get("nick") != null) {
-            for (String s : requestProperties.get("nick")) {
+        if (requestProperties.get("--nick") != null) {
+            for (String s : requestProperties.get("--nick")) {
                 students.add(s);
             }
             Map<String, List<String>> StudentData = new HashMap<>();
@@ -55,7 +55,7 @@ public class StudentInfo extends GeneralBehavior {
 
         }
         //------------------------------------------------------------------------------------------
-        if (requestProperties.get("name") != null) {
+        if (requestProperties.get("--name") != null) {
             //Taking out arguments of name, all the names
             for (String s : requestProperties.get("name")) {
                 students.add(s);
@@ -74,8 +74,8 @@ public class StudentInfo extends GeneralBehavior {
 
         }
         //------------------------------------------------------------------------------------------
-        if (requestProperties.get("user") != null) {
-            for (String s : requestProperties.get("user")) {
+        if (requestProperties.get("--user") != null) {
+            for (String s : requestProperties.get("--user")) {
                 students.add(s);
             }
             Map<String, List<String>> StudentData = new HashMap<>();
@@ -93,11 +93,11 @@ public class StudentInfo extends GeneralBehavior {
         }
 
         //------------------------------------------------------------------------------------------
-        if (requestProperties.get("group") != null ) {
+        if (requestProperties.get("--group") != null ) {
             ArrayList<String> Groups = new ArrayList<>();
             String report = "";
 
-            for (String s : requestProperties.get("group")) {
+            for (String s : requestProperties.get("--group")) {
                 Groups.add(s);
             }
             Map<String, List<String>> StudentData = new HashMap<>();

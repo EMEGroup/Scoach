@@ -182,7 +182,7 @@ public class GeneralStuff {
 		
 	}
         
-        public static  Map<String, String> _forgeMessage(Map<String, List<String>> messageProperties){
+	public static  Map<String, String> _forgeMessage(Map<String, List<String>> messageProperties){
 		
 		Map<String, String> result = new HashMap<String, String>();
 		
@@ -253,7 +253,7 @@ public class GeneralStuff {
 				key = argument.substring(2, argument.length());
 				values = new String[]{""};
 			}else{
-				key = argument.substring(2, argument.indexOf(" "));
+				key = argument.substring(0, argument.indexOf(" "));
 				values = argument.replaceFirst("--"+key+"[ ]+", "").split(
 					"([ ]*[,]+[ ]*)+");
 			}
@@ -264,15 +264,15 @@ public class GeneralStuff {
 		return args;
 	}
         
-      public static Map<String, List<String>> _copyMap(Map<String, List<String>> requestProperties){
+	public static Map<String, List<String>> _copyMap(Map<String, List<String>> requestProperties){
         Map<String, List<String>> tmpMap = new HashMap<>();
         
         Set<Map.Entry<String, List<String>>> entrySet = requestProperties.entrySet();
-	Iterator<Map.Entry<String, List<String>>> iterator = entrySet.iterator();
+		Iterator<Map.Entry<String, List<String>>> iterator = entrySet.iterator();
 		
-	while( iterator.hasNext() ){
-        Map.Entry<String, List<String>> next = iterator.next();
-            tmpMap.put(next.getKey(), next.getValue());
+		while( iterator.hasNext() ){
+			Map.Entry<String, List<String>> next = iterator.next();
+				tmpMap.put(next.getKey(), next.getValue());
         }
         
         return tmpMap;
