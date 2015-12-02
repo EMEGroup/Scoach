@@ -1,6 +1,7 @@
 package codeforcesInfo;
 
 import Misc.GeneralStuff;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -171,7 +172,7 @@ public class Methods {
 	}
 	
 	public static Map<String, String> getSubmissions(String handle, 
-		Long startingTime, Integer count, String verdict, List<String> tags){
+		Long startingTime, Integer count, String verdict, List<String> tags) throws IOException{
 		
 		int bufferStep = 1000;	// How many submissions to query every request
 		String submissionsUrl;

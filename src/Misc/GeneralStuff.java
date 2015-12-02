@@ -67,66 +67,43 @@ public class GeneralStuff {
 		return self;
 	}
 	
-	public static String getChannelInfo(String channelId, boolean privateGroup){
-		HttpRequest req;
+	public static String getChannelInfo(String channelId, boolean privateGroup) throws IOException{
+		String addr = "";
 			
 		if(privateGroup)
-			req = new HttpRequest(	SLACKAPIURL+"/groups.info?token="+APITOKEN+"&channel="+channelId);
+			addr = SLACKAPIURL+"/groups.info?token="+APITOKEN+"&channel="+channelId;
 		else
-			req = new HttpRequest(	SLACKAPIURL+"/channels.info?token="+APITOKEN+"&channel="+channelId);
-		req.startConnection();
+			addr = SLACKAPIURL+"/channels.info?token="+APITOKEN+"&channel="+channelId;
 		
 		String channel_name = "";
 		
-		try {
-			JsonReader j = 
-				new JsonReader( new InputStreamReader(req.getInputStream()) );
-			j.setLenient(true);
-			
-			Gson g = new Gson();
-			ChannelInfo c = g.fromJson(j, ChannelInfo.class);
-			
-			if(privateGroup){
-				if(c.group != null)	
-					channel_name = c.group.name;
-			}
-			else{
-				if(c.channel != null)
-					channel_name = c.channel.name;
-			}
-			
-		} catch (IOException ex) {
-			Logger.getLogger(GeneralStuff.class.getName()).log(Level.SEVERE, null, ex);
+		ChannelInfo c = getResponseObject(addr, ChannelInfo.class);
+		
+		if(privateGroup){
+			if(c.group != null)	
+				channel_name = c.group.name;
+		}
+		else{
+			if(c.channel != null)
+				channel_name = c.channel.name;
 		}
 		
-		req.getConnection().disconnect();
 		return channel_name;
 	}
-	public static String getUserInfo(String channelId){
-		HttpRequest req = new HttpRequest(	SLACKAPIURL+"/users.info?token="+APITOKEN+"&user="+channelId);
-		req.startConnection();
+	public static String getUserInfo(String channelId) throws IOException{
+		String addr = SLACKAPIURL+"/users.info?token="+APITOKEN+"&user="+channelId;
 		
 		String user_name = "";
 		
-		try {
-			JsonReader j = 
-				new JsonReader( new InputStreamReader(req.getInputStream()) );
-			j.setLenient(true);
+		ChannelInfo c = getResponseObject(addr, ChannelInfo.class);
 			
-			Gson g = new Gson();
-			ChannelInfo c = g.fromJson(j, ChannelInfo.class);
-			
-			if(c.user != null)
-				user_name = c.user.name;
-		} catch (IOException ex) {
-			Logger.getLogger(GeneralStuff.class.getName()).log(Level.SEVERE, null, ex);
-		}
+		if(c.user != null)
+			user_name = c.user.name;
 		
-		req.getConnection().disconnect();
 		return user_name;
 	}
 	
-	public static <T> T getResponseObject(String url, Class<T> responseClass){
+	public static <T> T getResponseObject(String url, Class<T> responseClass) throws IOException{
 		HttpRequest conn;
 		JsonReader jr;
 		Gson g;
@@ -170,19 +147,23 @@ public class GeneralStuff {
 		
 		HttpRequest conn;
 		
-		if(messageProperties.containsKey("queryString"))
-			conn = new HttpRequest(
-				GeneralStuff.WEBHOOKURL + messageProperties.get("queryString"));
-		else
-			conn = new HttpRequest(GeneralStuff.WEBHOOKURL);
-		
-		conn.startConnection();
-		conn.write(message);
-		conn.disconnect();
-		
+		try{
+			if(messageProperties.containsKey("queryString"))
+				conn = new HttpRequest(
+					GeneralStuff.WEBHOOKURL + messageProperties.get("queryString"));
+			else
+				conn = new HttpRequest(GeneralStuff.WEBHOOKURL);
+			
+			conn.startConnection();
+			conn.write(message);
+			conn.disconnect();
+			
+		} catch (IOException ex) {
+			Logger.getLogger(GeneralStuff.class.getName()).log(Level.SEVERE, null, ex);
+		}
 	}
         
-        public static  Map<String, String> _forgeMessage(Map<String, List<String>> messageProperties){
+	public static  Map<String, String> _forgeMessage(Map<String, List<String>> messageProperties) throws IOException{
 		
 		Map<String, String> result = new HashMap<String, String>();
 		
@@ -250,11 +231,11 @@ public class GeneralStuff {
 			argument = argument.trim();
 			
 			if( !argument.contains(" ") ){
-				key = argument.substring(2, argument.length());
+				key = argument.substring(0, argument.length());
 				values = new String[]{""};
 			}else{
-				key = argument.substring(2, argument.indexOf(" "));
-				values = argument.replaceFirst("--"+key+"[ ]+", "").split(
+				key = argument.substring(0, argument.indexOf(" "));
+				values = argument.replaceFirst(key+"[ ]+", "").split(
 					"([ ]*[,]+[ ]*)+");
 			}
 			
@@ -264,15 +245,15 @@ public class GeneralStuff {
 		return args;
 	}
         
-      public static Map<String, List<String>> _copyMap(Map<String, List<String>> requestProperties){
+	public static Map<String, List<String>> _copyMap(Map<String, List<String>> requestProperties){
         Map<String, List<String>> tmpMap = new HashMap<>();
         
         Set<Map.Entry<String, List<String>>> entrySet = requestProperties.entrySet();
-	Iterator<Map.Entry<String, List<String>>> iterator = entrySet.iterator();
+		Iterator<Map.Entry<String, List<String>>> iterator = entrySet.iterator();
 		
-	while( iterator.hasNext() ){
-        Map.Entry<String, List<String>> next = iterator.next();
-            tmpMap.put(next.getKey(), next.getValue());
+		while( iterator.hasNext() ){
+			Map.Entry<String, List<String>> next = iterator.next();
+				tmpMap.put(next.getKey(), next.getValue());
         }
         
         return tmpMap;
