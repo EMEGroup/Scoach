@@ -1,7 +1,9 @@
 package codeforcesInfo;
 
 import Misc.GeneralStuff;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -170,7 +172,7 @@ public class Methods {
 	}
 	
 	public static Map<String, String> getSubmissions(String handle, 
-		Long startingTime, Integer count, String verdict, List<String> tags){
+		Long startingTime, Integer count, String verdict, List<String> tags) throws IOException{
 		
 		int bufferStep = 1000;	// How many submissions to query every request
 		String submissionsUrl;
@@ -304,7 +306,7 @@ public class Methods {
 		
 		// Sort based on the Submission.compareTo method.
 		// The submissions will be arranged from oldest to newest
-		submissionsInRange.sort(null);
+		Collections.sort(submissionsInRange);
 		
 		if(startingTime != null){
 			// Find the very first submission within the time range
