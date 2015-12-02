@@ -1,10 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package Misc;
-
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -14,16 +8,16 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class UserInteraction implements Runnable{
-    private final String meanwhileMessage = "Please wait...";
+	private final String startMessage = "Your command has been received, keep calm ...";
+    private final String meanwhileMessage = "Please wait ...";
     private final String errorMessage = "An error has occourred.";
-    private final String doneMessage = "Finished.";
     private String canal;
     private boolean alive = true;
     private Map<String, List<String>> requestPropertiesGlobal;
     private boolean error = false;
     
     public void prepareInfo(Map<String, List<String>> requestProperties) {
-        //Implementar la interaccion con el usuario en un hilo que va con el comando principal.
+		
         boolean private_group;
         requestPropertiesGlobal = GeneralStuff._copyMap(requestProperties);
         if(requestProperties.get("channel_name") != null){
@@ -44,6 +38,16 @@ public class UserInteraction implements Runnable{
         else{
             canal = GeneralStuff.DEFAULTCHANNEL;
         }
+		
+		requestPropertiesGlobal.put(
+			"text", Arrays.asList(new String[]{startMessage}) );
+		
+		try {
+			GeneralStuff._sendMessage(
+				GeneralStuff._forgeMessage(requestPropertiesGlobal));
+		} catch (IOException ex) {
+			Logger.getLogger(UserInteraction.class.getName()).log(Level.SEVERE, null, ex);
+		}
     }
     
     @Override
@@ -59,7 +63,7 @@ public class UserInteraction implements Runnable{
 				}
 				LastMessage = System.currentTimeMillis();
 				requestPropertiesGlobal.put("text",Arrays.asList(new String[] {meanwhileMessage}));
-
+				System.out.println(meanwhileMessage);
 				 try {
 					 GeneralStuff._sendMessage(GeneralStuff._forgeMessage(requestPropertiesGlobal));
 				 } catch (IOException ex) {
@@ -76,18 +80,9 @@ public class UserInteraction implements Runnable{
 				Logger.getLogger(UserInteraction.class.getName()).log(Level.SEVERE, null, ex);
 			}
 		}
-        else{
-                requestPropertiesGlobal.put("text",Arrays.asList(new String[] {doneMessage}));
-			
-			try {
-				GeneralStuff._sendMessage(GeneralStuff._forgeMessage(requestPropertiesGlobal));
-			} catch (IOException ex) {
-				Logger.getLogger(UserInteraction.class.getName()).log(Level.SEVERE, null, ex);
-			}
-        }
-        return;
+		
+		// Here lays the tomb of an unnecesary return statement, thanks Java.
     }
-    
     
     public void killThread(){
         alive = false;

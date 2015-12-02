@@ -15,11 +15,6 @@ public class Commands {
 		talking.startThread();
                 
 		Map<String, String> result = _help.Run(requestProperties);
-		
-		if(result == null){
-			talking.stopThread();
-				return;
-		}
                 
 		talking.stopThread();
 		
@@ -39,11 +34,6 @@ public class Commands {
 		talking.startThread();
 		
 		Map<String, String> result = _echo.Run(requestProperties);
-		
-		if(result == null){
-			talking.stopThread();
-			return;
-		}
                 
 		talking.stopThread();
 		
@@ -68,13 +58,14 @@ public class Commands {
 			result = _submissions.Run( GeneralStuff._getArguments(requestProperties) );
 		} catch (IOException ex) {
 			talking.notifyError();
+			talking.stopThread();
 		}
 		
 		talking.stopThread();
                 
 		String text = result.get("text");
 		requestProperties.put("text", Arrays.asList(new String[]{text}));
-		
+		System.out.println(text);
 		try {
 			GeneralStuff._sendMessage( GeneralStuff._forgeMessage(requestProperties) );
 		} catch (IOException ex) {
@@ -89,11 +80,6 @@ public class Commands {
                 
 		Map<String, String> result = 
 			_studentInfo.Run( GeneralStuff._getArguments(requestProperties));		
-		
-		if(result == null) {
-			talking.stopThread();
-			return;
-		}
 		
 		talking.stopThread();
                 
@@ -119,6 +105,7 @@ public class Commands {
 
 		public void notifyError(){
 			this.instance.notifyError();
+			this.instance.killThread();
 		}
 
 		public void stopThread(){

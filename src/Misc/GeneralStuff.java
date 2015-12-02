@@ -231,11 +231,11 @@ public class GeneralStuff {
 			argument = argument.trim();
 			
 			if( !argument.contains(" ") ){
-				key = argument.substring(2, argument.length());
+				key = argument.substring(0, argument.length());
 				values = new String[]{""};
 			}else{
 				key = argument.substring(0, argument.indexOf(" "));
-				values = argument.replaceFirst("--"+key+"[ ]+", "").split(
+				values = argument.replaceFirst(key+"[ ]+", "").split(
 					"([ ]*[,]+[ ]*)+");
 			}
 			

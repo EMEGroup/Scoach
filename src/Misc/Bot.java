@@ -47,7 +47,7 @@ public class Bot {
 		String[] x = new String[1];
 		Map<String, String[]> h = new HashMap<String, String[]>();
 
-		x[0] = "submissions --by rioma_san --since 10y --all --tags dp --verdict AC";
+		x[0] = "submissions --by angelg2095 --show 860";
 		h.put("text", x.clone());
 		
 		x[0] = "bot-playground";
