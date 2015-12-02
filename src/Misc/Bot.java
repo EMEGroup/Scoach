@@ -34,10 +34,10 @@ public class Bot {
                   
 		
 		if(GeneralStuff.COMMANDS.get(command) != null){
-                    GeneralStuff.COMMANDS.get(command).execute(reqProperties);
+			GeneralStuff.COMMANDS.get(command).execute(reqProperties);
 		}
 		else
-                    GeneralStuff.COMMANDS.get("help").execute(reqProperties);
+			GeneralStuff.COMMANDS.get("help").execute(reqProperties);
 	}
 	
 	@SuppressWarnings("unchecked")
