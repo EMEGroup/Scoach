@@ -1,7 +1,5 @@
 package Misc;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -34,29 +32,25 @@ public class Bot {
 		reqProperties.get("text").set(0,
 			reqProperties.get("text").get(0).replaceFirst(command+"[ \t]*", ""));
 		command = command.toLowerCase();
-                UserInteraction instancia = new UserInteraction();
-                instancia.prepareInfo(reqProperties);
-                Thread t1 = new Thread(instancia);
+		UserInteraction instancia = new UserInteraction();
+		instancia.prepareInfo(reqProperties);
+		Thread t1 = new Thread(instancia);
                   
 		
-		if(GeneralStuff.commands.get(command) != null){
-                    t1.start();
-                    try{
-                        GeneralStuff.commands.get(command).execute(reqProperties);
-                    }catch(Exception e){
-                        e.printStackTrace();
-                        
-                        instancia.notifyError();
-                        
-                    }
-                    finally{
-                        
-                        instancia.killThread();
-                        t1.join();
-                    }
-                }
+		if(GeneralStuff.COMMANDS.get(command) != null){
+			t1.start();
+			try{
+				GeneralStuff.COMMANDS.get(command).execute(reqProperties);
+			}catch(Exception e){
+				instancia.notifyError();
+			}
+			finally{
+				instancia.killThread();
+				t1.join();
+			}
+		}
 		else
-			GeneralStuff.commands.get("help").execute(reqProperties);
+			GeneralStuff.COMMANDS.get("help").execute(reqProperties);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -66,20 +60,20 @@ public class Bot {
 		String[] x = new String[1];
 		Map<String, String[]> h = new HashMap<String, String[]>();
 		
-		x[0] = "submissions --by kojak_";
+		x[0] = "submissions --by rioma_san --since 10y --all --tags dp --verdict AC";
 		h.put("text", x.clone());
 		
-		x[0] = "privategroup";
+		x[0] = "bot-playground";
 		h.put("channel_name", x.clone());
 		
-		x[0] = "C0D50765C";
+		x[0] = "C0D50765F";
 		h.put("channel_id", x.clone());
 		
-            try {
-                work(h);
-            } catch (InterruptedException ex) {
-                Logger.getLogger(Bot.class.getName()).log(Level.SEVERE, null, ex);
-            }
+		try {
+			work(h);
+		} catch (InterruptedException ex) {
+			Logger.getLogger(Bot.class.getName()).log(Level.SEVERE, null, ex);
+		}
 	}
 	
 }
