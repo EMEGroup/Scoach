@@ -31,26 +31,13 @@ public class Bot {
 		reqProperties.get("text").set(0,
 			reqProperties.get("text").get(0).replaceFirst(command+"[ \t]*", ""));
 		command = command.toLowerCase();
-		UserInteraction instancia = new UserInteraction();
-		instancia.prepareInfo(reqProperties);
-		Thread t1 = new Thread(instancia);
                   
 		
 		if(GeneralStuff.COMMANDS.get(command) != null){
-			t1.start();
-			try{
-				GeneralStuff.COMMANDS.get(command).execute(reqProperties);
-			}catch(Exception e){
-				instancia.notifyError();
-			}
-			finally{
-				instancia.killThread();
-				t1.join();
-                                
-			}
+                    GeneralStuff.COMMANDS.get(command).execute(reqProperties);
 		}
 		else
-			GeneralStuff.COMMANDS.get("help").execute(reqProperties);
+                    GeneralStuff.COMMANDS.get("help").execute(reqProperties);
 	}
 	
 	@SuppressWarnings("unchecked")
