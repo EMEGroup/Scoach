@@ -1,5 +1,6 @@
 package behavior;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,7 +18,7 @@ public class Submissions extends GeneralBehavior{
 		+ "--all\t\t\t\tShow all submissions, overrides the --show argument.";
 	
 	@Override
-	public Map<String, String> Run(Map<String, List<String>> requestProperties) {
+	public Map<String, String> Run(Map<String, List<String>> requestProperties) throws IOException{
 		
 		String handle;
 		String time = null;

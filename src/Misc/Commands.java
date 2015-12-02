@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Commands {
 	public void help(Map<String, List<String>> requestProperties){
@@ -18,7 +20,11 @@ public class Commands {
 		String text = result.get("text");
 		requestProperties.put("text", Arrays.asList(new String[]{text}));
 		
-		GeneralStuff._sendMessage( GeneralStuff._forgeMessage(requestProperties) );
+		try {
+			GeneralStuff._sendMessage( GeneralStuff._forgeMessage(requestProperties) );
+		} catch (IOException ex) {
+			Logger.getLogger(Commands.class.getName()).log(Level.SEVERE, null, ex);
+		}
 	}
 	
 	public void echo(Map<String, List<String>> requestProperties){
@@ -32,14 +38,23 @@ public class Commands {
 		String text = result.get("text");
 		requestProperties.put("text", Arrays.asList(new String[]{text}));
 		
-		GeneralStuff._sendMessage( GeneralStuff._forgeMessage(requestProperties) );
+		try {
+			GeneralStuff._sendMessage( GeneralStuff._forgeMessage(requestProperties) );
+		} catch (IOException ex) {
+			Logger.getLogger(Commands.class.getName()).log(Level.SEVERE, null, ex);
+		}
 	}
 	
 	public void submissions(Map<String, List<String>> requestProperties){
 		Submissions _submissions = new Submissions();
 		
-		Map<String, String> result = 
-			_submissions.Run( GeneralStuff._getArguments(requestProperties) );
+		Map<String, String> result = null;
+		
+		try {
+			result = _submissions.Run( GeneralStuff._getArguments(requestProperties) );
+		} catch (IOException ex) {
+			Logger.getLogger(Commands.class.getName()).log(Level.SEVERE, null, ex);
+		}
 		
 		if(result == null)
 			return;
@@ -47,7 +62,11 @@ public class Commands {
 		String text = result.get("text");
 		requestProperties.put("text", Arrays.asList(new String[]{text}));
 		
-		GeneralStuff._sendMessage( GeneralStuff._forgeMessage(requestProperties) );
+		try {
+			GeneralStuff._sendMessage( GeneralStuff._forgeMessage(requestProperties) );
+		} catch (IOException ex) {
+			Logger.getLogger(Commands.class.getName()).log(Level.SEVERE, null, ex);
+		}
 	}
 	
 	public void studentInfo(Map<String, List<String>> requestProperties) throws IOException, InterruptedException{

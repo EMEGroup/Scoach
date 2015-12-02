@@ -6,9 +6,12 @@
 package Misc;
 
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class UserInteraction implements Runnable{
     private final String meanwhileMessage = "Please wait...";
@@ -32,7 +35,11 @@ public class UserInteraction implements Runnable{
         
         if(requestProperties.get("channel_id") != null){
            canal = requestProperties.get("channel_id").get(0);
-           canal = GeneralStuff.getChannelInfo(canal, private_group);
+			try {
+				canal = GeneralStuff.getChannelInfo(canal, private_group);
+			} catch (IOException ex) {
+				Logger.getLogger(UserInteraction.class.getName()).log(Level.SEVERE, null, ex);
+			}
         }
         else{
             canal = GeneralStuff.DEFAULTCHANNEL;
@@ -43,26 +50,40 @@ public class UserInteraction implements Runnable{
     public void run(){
         long LastMessage = System.currentTimeMillis();
         while(alive && !(Thread.interrupted())){
-            if(!alive){
-                break;
-            }
-           if(System.currentTimeMillis() - LastMessage > 5000 && alive && !(Thread.interrupted())){
-               if(!alive){
-                   break;
-               }
-               LastMessage = System.currentTimeMillis();
-               requestPropertiesGlobal.put("text",Arrays.asList(new String[] {meanwhileMessage}));
-               GeneralStuff._sendMessage(GeneralStuff._forgeMessage(requestPropertiesGlobal));
-               
-           }
+			if(!alive){
+				break;
+			}
+			if(System.currentTimeMillis() - LastMessage > 5000 && alive && !(Thread.interrupted())){
+				if(!alive){
+					break;
+				}
+				LastMessage = System.currentTimeMillis();
+				requestPropertiesGlobal.put("text",Arrays.asList(new String[] {meanwhileMessage}));
+
+				 try {
+					 GeneralStuff._sendMessage(GeneralStuff._forgeMessage(requestPropertiesGlobal));
+				 } catch (IOException ex) {
+					 Logger.getLogger(UserInteraction.class.getName()).log(Level.SEVERE, null, ex);
+				 }
+			}
         }
         if(error){
                requestPropertiesGlobal.put("text",Arrays.asList(new String[] {errorMessage}));
-               GeneralStuff._sendMessage(GeneralStuff._forgeMessage(requestPropertiesGlobal));
-           }
+               
+			try {
+				GeneralStuff._sendMessage(GeneralStuff._forgeMessage(requestPropertiesGlobal));
+			} catch (IOException ex) {
+				Logger.getLogger(UserInteraction.class.getName()).log(Level.SEVERE, null, ex);
+			}
+		}
         else{
                 requestPropertiesGlobal.put("text",Arrays.asList(new String[] {doneMessage}));
-                GeneralStuff._sendMessage(GeneralStuff._forgeMessage(requestPropertiesGlobal));
+			
+			try {
+				GeneralStuff._sendMessage(GeneralStuff._forgeMessage(requestPropertiesGlobal));
+			} catch (IOException ex) {
+				Logger.getLogger(UserInteraction.class.getName()).log(Level.SEVERE, null, ex);
+			}
         }
         return;
     }
