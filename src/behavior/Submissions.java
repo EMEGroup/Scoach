@@ -42,10 +42,6 @@ public class Submissions extends GeneralBehavior{
 			verdict = requestProperties.get("--verdict").get(0);
 		}
 		
-<<<<<<< HEAD
-		if(requestProperties.get("count") != null){
-			count = Integer.parseInt(requestProperties.get("count").get(0));
-=======
 		if(requestProperties.get("--show") != null){
 			if( !requestProperties.get("--show").get(0).isEmpty() )
 				show = Integer.parseInt(requestProperties.get("--show").get(0));
@@ -53,7 +49,6 @@ public class Submissions extends GeneralBehavior{
 		
 		if(requestProperties.get("--all") != null){
 			show = null;
->>>>>>> master
 		}
 		
 		if(requestProperties.get("--since") != null){
@@ -80,19 +75,12 @@ public class Submissions extends GeneralBehavior{
 		}
 		
 		responseProperties = 
-<<<<<<< HEAD
-			codeforcesInfo.Methods.getSubmissions(handle, from, count, verdict, 
-			requestProperties.get("tags"));
-=======
 			codeforcesInfo.Methods.getSubmissions(handle, from, show, verdict, 
 			requestProperties.get("--tags"));
->>>>>>> master
 		
 		String banner = "Submissions of " + handle;
 		if(verdict != null)	banner += ", with verdict of " + verdict;
 		if(time != null) banner += ", from " + time + " ago";
-<<<<<<< HEAD
-=======
 		if(requestProperties.get("--tags") != null && requestProperties.get("--tags").isEmpty() == false){
 			banner += ", with tags of ";
 			
@@ -103,7 +91,6 @@ public class Submissions extends GeneralBehavior{
 			}
 		}
 		
->>>>>>> master
 		banner += ":\n";
 		
 		if(!responseProperties.get("text").isEmpty()){

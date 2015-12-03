@@ -18,7 +18,7 @@ import java.util.regex.Pattern;
 
 public class GeneralStuff {
 	
-	public final static String APIToken = "xoxp-10522107940-10536035312-12886577955-3187f9ba9a"; // Change it !!
+	public final static String APITOKEN = "xoxp-10522107940-10536035312-12886577955-3187f9ba9a"; // Change it !!
 	public final static String WebhookUrl = "https://hooks.slack.com/services/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";
 	public final static String SlackApiURL = "https://slack.com/api";
 	public final static String defaultChannel = "#scoachtest";
