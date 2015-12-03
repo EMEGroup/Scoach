@@ -34,14 +34,14 @@ public class GeneralStuff {
 			public void execute(Map<String, List<String>> req){ C.echo(req); }
 		});
 		
-		COMMANDS.put("submissions", new Command(){
-			@Override
-			public void execute(Map<String, List<String>> req){ C.submissions(req); }
-		});
-		
 		COMMANDS.put("help", new Command(){
 			@Override
 			public void execute(Map<String, List<String>> req){ C.help(req); }
+		});
+		
+		COMMANDS.put("submissions", new Command(){
+			@Override
+			public void execute(Map<String, List<String>> req){ C.submissions(req); }
 		});
         
 		COMMANDS.put("student", new Command(){
@@ -55,6 +55,11 @@ public class GeneralStuff {
 					Logger.getLogger(GeneralStuff.class.getName()).log(Level.SEVERE, null, ex);
 				}
 }
+		});
+		
+		COMMANDS.put("compare", new Command(){
+			@Override
+			public void execute(Map<String, List<String>> req){ C.compare(req); }
 		});
 	}
 	

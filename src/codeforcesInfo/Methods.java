@@ -18,23 +18,32 @@ public class Methods {
 		QUESTION
 	}
 	public enum ProblemVerdict{
-		FAILED,
-		OK,
-		PARTIAL,
-		COMPILATION_ERROR,
-		RUNTIME_ERROR,
-		WRONG_ANSWER,
-		PRESENTATION_ERROR,
-		TIME_LIMIT_EXCEEDED,
-		MEMORY_LIMIT_EXCEEDED,
-		IDLENESS_LIMIT_EXCEEDED,
-		SECURITY_VIOLATED,
-		CRASHED,
-		INPUT_PREPARATION_CRASHED,
-		CHALLENGED,
-		SKIPPED,
-		TESTING,
-		REJECTED
+		FAILED("FAILED"),
+		OK("AC"),
+		PARTIAL("PARTIAL"),
+		COMPILATION_ERROR("CE"),
+		RUNTIME_ERROR("RE"),
+		WRONG_ANSWER("WA"),
+		PRESENTATION_ERROR("PE"),
+		TIME_LIMIT_EXCEEDED("TLE"),
+		MEMORY_LIMIT_EXCEEDED("MLE"),
+		IDLENESS_LIMIT_EXCEEDED("IDLENESS_LIMIT_EXCEEDED"),
+		SECURITY_VIOLATED("SECURITY_VIOLATED"),
+		CRASHED("CRASHED"),
+		INPUT_PREPARATION_CRASHED("INPUT_PREPARATION_CRASHED"),
+		CHALLENGED("HACKED"),
+		SKIPPED("SKIPPED"),
+		TESTING("TESTING"),
+		REJECTED("REJECTED");
+		
+		private final String name;
+		private ProblemVerdict(String name){
+			this.name = name;
+		}
+		
+		public String getValue(){
+			return this.name;
+		}
 	}
 	public enum ContestType{
 		CF,
@@ -123,62 +132,11 @@ public class Methods {
 		public List<Submission> result;
 	}
 	
-	private static ProblemVerdict translateVerdict( String verdict){
-		if(verdict == null)	return null;
-		
-		switch( verdict ){
-			case "AC":
-				return ProblemVerdict.OK;
-			case "WA":
-				return ProblemVerdict.WRONG_ANSWER;
-			case "TLE":
-				return ProblemVerdict.TIME_LIMIT_EXCEEDED;
-			case "MLE":
-				return ProblemVerdict.MEMORY_LIMIT_EXCEEDED;
-			case "CE":
-				return ProblemVerdict.COMPILATION_ERROR;
-			case "RTE":
-				return ProblemVerdict.RUNTIME_ERROR;
-			case "PE":
-				return ProblemVerdict.PRESENTATION_ERROR;
-			case "HACKED":
-				return ProblemVerdict.CHALLENGED;
-			default:
-				return null;
-		}
-	}
-	
-	private static String translateVerdict( ProblemVerdict verdict){
-		if(verdict == null)	return null;
-		
-		if(verdict == ProblemVerdict.OK)
-			return "AC";
-		if(verdict == ProblemVerdict.WRONG_ANSWER)
-			return "WA";
-		if(verdict == ProblemVerdict.TIME_LIMIT_EXCEEDED)
-			return "TLE";
-		if(verdict == ProblemVerdict.MEMORY_LIMIT_EXCEEDED)
-			return "MLE";
-		if(verdict == ProblemVerdict.COMPILATION_ERROR)
-			return "CE";
-		if(verdict == ProblemVerdict.RUNTIME_ERROR)
-			return "RTE";
-		if(verdict == ProblemVerdict.PRESENTATION_ERROR)
-			return "PE";
-		if(verdict == ProblemVerdict.CHALLENGED)
-			return "HACKED";
-		
-		return null;
-	}
-	
-	public static Map<String, String> getSubmissions(String handle, 
+	public static Map<String, String> getSubmissionsReport(String handle, 
 		Long startingTime, Integer count, String verdict, List<String> tags) throws IOException{
 		
-		int bufferStep = 1000;	// How many submissions to query every request
+		Map<String, String> returnObject = new HashMap<String,String>();
 		String submissionsUrl;
-		Map<String, String> returnObject;
-		List<Submission> submissionsInRange = new ArrayList<Submission>();
-		returnObject = new HashMap<String, String>();
 		
 		if(handle == null || handle.isEmpty())	return null;
 		if(count != null && count <= 0)	return null;	// count >= 1 is ok
@@ -189,10 +147,21 @@ public class Methods {
 		submissionsUrl = METHODSURL + "user.status?" + 	"handle=" + handle;
 		
 		// Check if the verdict is a valid one
-		if( verdict != null && translateVerdict(verdict) == null ){
-			returnObject.put("text", 
-				"The passed VERDICT does not exist in codeforces or is not valid.");
-			return returnObject;
+		if( verdict != null ){
+			boolean flag = false;
+			
+			for( ProblemVerdict e : ProblemVerdict.values() ){
+				if( e.getValue().equals(verdict) == true ){
+					flag = true;
+					break;
+				}
+			}
+			
+			if( flag == false ){
+				returnObject.put("text", 
+					"The passed VERDICT does not exist in codeforces or is not valid.");
+				return returnObject;
+			}
 		}
 		
 		// Test with a request to codeforces, validating handle and stuff
@@ -211,12 +180,53 @@ public class Methods {
 			}
 		}
 		
-		if(tags == null)	
-			tags = new ArrayList<String>();
-		
 		if(startingTime != null){
 			startingTime = Math.abs(startingTime);
 		}
+		
+		List<Submission> submissionsInRange = 
+			getSubmissions(handle, startingTime, count, verdict, tags);
+		
+		String text = "";
+		
+		// Assemble the response message if there are submissions to return ...
+		if( submissionsInRange.isEmpty() == false ){
+			String columnIDs = "ID | " +"PROBLEM NAME | " + "PROBLEM INDEX | " 
+				+ "EXECUTION TIME | " + "USED MEMORY | " + "VERDICT | " + "LINK\n";
+
+			for( int i = 0; i < submissionsInRange.size(); i++){
+				Submission sub = submissionsInRange.get(i);
+				
+				columnIDs +=
+					"[" + (i+1) + "]  " +
+					"[" + sub.getProblem().getName() + "]\t" + 
+					"[" + sub.getProblem().getIndex() + "] " +
+					"[" + sub.getTimeConsumedMillis() + "ms] " +
+					"[" + sub.getMemoryConsumedBytes() + "B] " +
+					"[" + sub.getVerdict().getValue() + "] " +
+					"[" + PROBLEMSURL + sub.getContestId() + "/" + sub.getProblem().getIndex() + "]";
+
+				columnIDs += "\n";
+			}
+			
+			text += columnIDs;
+			text += "END OF LIST.";
+		}
+
+		returnObject.put("text", text);
+		return returnObject;
+	}
+	
+	public static List<Submission> getSubmissions(String handle, 
+		Long startingTime, Integer count, String verdict, List<String> tags) throws IOException{
+		
+		int bufferStep = 1000;	// How many submissions to query every request
+		List<Submission> submissionsList = new ArrayList<Submission>();
+		String submissionsUrl = 
+			METHODSURL + "user.status?" + 	"handle=" + handle;
+		
+		if( tags == null )
+			tags = new ArrayList<String>();
 		
 		// Go fetching submissions chunks of 1000 submissions each to get all
 		// submissions from a user since the time specified by the caller
@@ -248,10 +258,10 @@ public class Methods {
 				if(tmpSubmissions.result.isEmpty()){
 					break;
 				}else{
-					submissionsInRange.addAll( tmpSubmissions.result );
+					submissionsList.addAll( tmpSubmissions.result );
 				}
 				
-				startingId = submissionsInRange.size()+1;
+				startingId = submissionsList.size()+1;
 				
 				if(tmpSubmissions.result.get(tmpSubmissions.result.size()-1).getCreationTimeSeconds() < startingTime )
 					break;
@@ -290,7 +300,8 @@ public class Methods {
 						user_status.class);
 				}
 				
-				submissionsInRange.addAll(tmpSubmissions.result);
+				if( tmpSubmissions != null && tmpSubmissions.result != null ){
+					submissionsList.addAll(tmpSubmissions.result);
 				
 				// There's no more submissions 
 				if(tmpSubmissions.result.isEmpty())	break;
@@ -298,6 +309,10 @@ public class Methods {
 				startingId += tmpSubmissions.result.size();
 				bufferCount = (count == null) ? bufferStep : 
 					Math.min(bufferStep, count - startingId + 1);
+				}
+				else{
+					break;
+				}
 				
 				// This is the rest of submissions, no more to be found.
 				if(tmpSubmissions.result.size() < bufferStep)	break;
@@ -306,7 +321,7 @@ public class Methods {
 		
 		// Sort based on the Submission.compareTo method.
 		// The submissions will be arranged from oldest to newest
-		Collections.sort(submissionsInRange);
+		Collections.sort(submissionsList);
 		
 		if(startingTime != null){
 			// Find the very first submission within the time range
@@ -324,36 +339,35 @@ public class Methods {
 				}
 			};
 			
-			if( submissionsInRange.isEmpty() == false ){
+			if( submissionsList.isEmpty() == false ){
 				Submission fakeSubmissionStoringTime;
 				
-				fakeSubmissionStoringTime = submissionsInRange.get(0);
+				fakeSubmissionStoringTime = submissionsList.get(0);
 				fakeSubmissionStoringTime.setCreationTimeSeconds(startingTime);
 				
 				firstIndex = 
-					_lowerBound(submissionsInRange, fakeSubmissionStoringTime,
+					_lowerBound(submissionsList, fakeSubmissionStoringTime,
 					comparator);
 			}
 			
 			// Get rid of the submissions laying outside of the time range
-			submissionsInRange = submissionsInRange.subList(
-				firstIndex, submissionsInRange.size());
+			submissionsList = submissionsList.subList(firstIndex, submissionsList.size());
 		}
 		
 		// Filter by verdict, tags, etc ...
-		for(int i = 0; i < submissionsInRange.size(); ){
+		for(int i = 0; i < submissionsList.size(); ){
 			
 			// Check for verdict
 			if(verdict != null){
-				if(submissionsInRange.get(i).getVerdict() != translateVerdict(verdict)){
-					submissionsInRange.remove(i);
+				if(submissionsList.get(i).getVerdict().getValue().equals(verdict) == false){
+					submissionsList.remove(i);
 					continue;
 				}
 			}
 
 			// Check for tags
-			if( !submissionsInRange.get(i).getProblem().getTags().containsAll(tags) ){
-				submissionsInRange.remove(i);
+			if( !submissionsList.get(i).getProblem().getTags().containsAll(tags) ){
+				submissionsList.remove(i);
 				continue;
 			}
 			
@@ -365,42 +379,15 @@ public class Methods {
 		// at the beginning of the list, omit if --all was passed (count == null)
 		
 		if( count != null ){
-			submissionsInRange = submissionsInRange.subList(
-				0, Math.max(0, Math.min(submissionsInRange.size(), count)));
+			submissionsList = submissionsList.subList(0, Math.max(0, Math.min(submissionsList.size(), count)));
 		}
 		
-		String text = "";
+		return submissionsList;
 		
-		// Assemble the response message if there are submissions to return ...
-		if( submissionsInRange.isEmpty() == false ){
-			String columnIDs = "ID | " +"PROBLEM NAME | " + "PROBLEM INDEX | " 
-				+ "EXECUTION TIME | " + "USED MEMORY | " + "VERDICT | " + "LINK\n";
-
-			for( int i = 0; i < submissionsInRange.size(); i++){
-				Submission sub = submissionsInRange.get(i);
-				
-				columnIDs +=
-					"[" + (i+1) + "]  " +
-					"[" + sub.getProblem().getName() + "]\t" + 
-					"[" + sub.getProblem().getIndex() + "] " +
-					"[" + sub.getTimeConsumedMillis() + "ms] " +
-					"[" + sub.getMemoryConsumedBytes() + "B] " +
-					"[" + translateVerdict(sub.getVerdict()) + "] " +
-					"[" + PROBLEMSURL + sub.getContestId() + "/" + sub.getProblem().getIndex() + "]";
-
-				columnIDs += "\n";
-			}
-			
-			text += columnIDs;
-			text += "END OF LIST.";
-		}
-
-		returnObject.put("text", text);
-		return returnObject;
 	}
 	
 	private static <T> int _lowerBound(List<T> arr, T val, Comparator<T> comparator){
-		return _lowerBound(arr, 0, arr.size()-1, val, comparator);
+		return _lowerBound(arr, 0, arr.size(), val, comparator);
 	}
 	
 	private static <T> int _lowerBound(List<T> arr, int firstIndex, int lastIndex, T val, Comparator<T> comparator){

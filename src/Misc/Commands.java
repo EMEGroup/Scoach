@@ -20,7 +20,7 @@ public class Commands {
 		
 		String text = result.get("text");
 		requestProperties.put("text", Arrays.asList(new String[]{text}));
-		
+		System.out.println(text);
 		try {
 			GeneralStuff._sendMessage( GeneralStuff._forgeMessage(requestProperties) );
 		} catch (IOException ex) {
@@ -49,7 +49,7 @@ public class Commands {
 	
 	public void submissions(Map<String, List<String>> requestProperties){
 		Submissions _submissions = new Submissions();
-                UnitofInteraction talking = new UnitofInteraction(requestProperties);
+		UnitofInteraction talking = new UnitofInteraction(requestProperties);
 		talking.startThread();
 		
 		Map<String, String> result = null;
@@ -58,10 +58,9 @@ public class Commands {
 			result = _submissions.Run( GeneralStuff._getArguments(requestProperties) );
 		} catch (IOException ex) {
 			talking.notifyError();
+		} finally{
 			talking.stopThread();
 		}
-		
-		talking.stopThread();
                 
 		String text = result.get("text");
 		requestProperties.put("text", Arrays.asList(new String[]{text}));
@@ -88,7 +87,32 @@ public class Commands {
 		
 		GeneralStuff._sendMessage( GeneralStuff._forgeMessage(requestProperties) );
 	}	
-        
+    
+	public void compare(Map<String, List<String>> requestProperties){
+		Compare _compare = new Compare();
+		UnitofInteraction talking = new UnitofInteraction(requestProperties);
+		talking.startThread();
+		
+		Map<String, String> result = null;
+		
+		try {
+			result = _compare.Run( GeneralStuff._getArguments(requestProperties) );
+		} catch (IOException ex) {
+			talking.notifyError();
+		} finally{
+			talking.stopThread();
+		}
+                
+		String text = result.get("text");
+		requestProperties.put("text", Arrays.asList(new String[]{text}));
+		System.out.println(text);
+		try {
+			GeneralStuff._sendMessage( GeneralStuff._forgeMessage(requestProperties) );
+		} catch (IOException ex) {
+			Logger.getLogger(Commands.class.getName()).log(Level.SEVERE, null, ex);
+		}
+	}
+	
 	private class UnitofInteraction{
 		Thread thread;
 		UserInteraction instance;

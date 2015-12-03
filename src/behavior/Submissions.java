@@ -1,6 +1,7 @@
 package behavior;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -8,7 +9,8 @@ import java.util.Map;
 public class Submissions extends GeneralBehavior{
 	
 	public static final String HELPTEXT = 
-		"submissions [OPTIONS] --by <codeforces handle of the user>\n" +
+		"Submissions                          Show submissions of an user.\n"
+		+ "submissions [OPTIONS] --by <codeforces handle of the user>\n" +
 		"OPTIONS:\n" +
 		"\t--tags <tag>[,<tag> ...]\t\tA comma separated list of problem tags. (dp, math, greedy ...)\n" +
 		"\t--oj <online judge>\t\t\tName of the online judges to search submissions for.\n" +
@@ -25,6 +27,7 @@ public class Submissions extends GeneralBehavior{
 		Integer show = 10;
 		Long from = null;
 		String verdict = null;
+		List<String> tags = null;
 		
 		Map<String, String> responseProperties;
 		
@@ -50,22 +53,29 @@ public class Submissions extends GeneralBehavior{
 			show = null;
 		}
 		
+		if(requestProperties.get("--tags") == null){
+			tags = new ArrayList<String>();
+		}else{
+			tags = requestProperties.get("--tags");
+		}
+		
 		if(requestProperties.get("--since") != null){
 			time = requestProperties.get("--since").get(0);
 			from = Long.parseLong( time.substring(0, time.length()-1) );
 			
+			int DayInSeconds = 60 * 60 * 24;
 			switch( Character.toLowerCase( time.charAt(time.length()-1) ) ){
 				case 'd':
-					from *= 60 * 60 * 24 * 1;
+					from *= DayInSeconds * 1;
 					break;
 				case 'w':
-					from *= 60 * 60 * 24 * 7;
+					from *= DayInSeconds * 7;
 					break;
 				case 'm':
-					from *= 60 * 60 * 24 * 30;
+					from *= DayInSeconds * 30;
 					break;
 				case 'y':
-					from *= 60 * 60 * 24 * 360;
+					from *= DayInSeconds * 360;
 					break;
 				default:
 					from = null;
@@ -76,8 +86,8 @@ public class Submissions extends GeneralBehavior{
 		}
 		
 		responseProperties = 
-			codeforcesInfo.Methods.getSubmissions(handle, from, show, verdict, 
-			requestProperties.get("--tags"));
+			codeforcesInfo.Methods.getSubmissionsReport(
+				handle, from, show, verdict, tags);
 		
 		String banner = "Submissions of " + handle;
 		if(verdict != null)	banner += ", with verdict of " + verdict;

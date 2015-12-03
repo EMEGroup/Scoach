@@ -7,11 +7,12 @@ import java.util.Map;
 public class Help extends GeneralBehavior{
 
 	public static final String HELPTEXT =
-			"Available commands:\n"
-			+ "    echo                                 Repeats what you write.\n"
-			+ "    submissions                          Show submissions of an user.\n"
-			+ "    help                                 Displays this help text.\n"
-			+ "For more info about a specific command, run help <command>.";
+		"Available commands:\n"
+		+ "    echo                                 Repeats what you write.\n"
+		+ "    submissions                          Show submissions of an user.\n"
+		+ "    help                                 Displays this help text.\n"
+		+ "    compare                              Displays a brief report of the performance of a list of contestants.\n"
+		+ "For more info about a specific command, run help <command>.";
 	
 	private static final Map<String, String> commandsHelp;
 	
@@ -22,6 +23,7 @@ public class Help extends GeneralBehavior{
 		commandsHelp.put("help", Help.HELPTEXT);
 		commandsHelp.put("submissions", Submissions.HELPTEXT);
 		commandsHelp.put("student", StudentInfo.HELPTEXT);
+		commandsHelp.put("compare", Compare.HELPTEXT);
 	}
 	
 	@Override
