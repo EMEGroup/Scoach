@@ -13,15 +13,16 @@ public class Submissions extends GeneralBehavior{
 		"\t--oj <online judge>\t\t\tName of the online judges to search submissions for.\n" +
 		"\t--verdict <verdict>\t\t\tVerdict string (AC, WA, TLE ...)\n" +
 		"\t--since <time>('d'|'w'|'m'|'y')\t\tTime of the first submission to show. (days, weeks, months ...)\n" +
-		"\t--show <amount>\t\t\tAmount of submissions to show\n"
-		+ "--all\t\t\t\tShow all submissions, overrides the --show argument.";
+		"\t--count <1..1000>\t\t\tAmount of submissions to use as scope, note that this implies that\n"
+		+ "\t\t\t\t\t\ta scope of a 1000 submissions filtered by any other option may\n"
+		+ "\t\t\t\t\t\tresult in a fewer amount of shown submissions. Default is 1.";
 	
 	@Override
 	public Map<String, String> Run(Map<String, List<String>> requestProperties) {
 		
 		String handle;
 		String time = null;
-		Integer show = 10;
+		int count = 1;
 		Long from = null;
 		String verdict = null;
 		
@@ -40,20 +41,15 @@ public class Submissions extends GeneralBehavior{
 			verdict = requestProperties.get("verdict").get(0);
 		}
 		
-		if(requestProperties.get("show") != null){
-			if( !requestProperties.get("show").get(0).isEmpty() )
-				show = Integer.parseInt(requestProperties.get("show").get(0));
-		}
-		
-		if(requestProperties.get("all") != null){
-			show = null;
+		if(requestProperties.get("count") != null){
+			count = Integer.parseInt(requestProperties.get("count").get(0));
 		}
 		
 		if(requestProperties.get("since") != null){
 			time = requestProperties.get("since").get(0);
 			from = Long.parseLong( time.substring(0, time.length()-1) );
 			
-			switch( Character.toLowerCase( time.charAt(time.length()-1) ) ){
+			switch( time.charAt(time.length()-1) ){
 				case 'd':
 					from *= 60 * 60 * 24 * 1;
 					break;
@@ -70,34 +66,22 @@ public class Submissions extends GeneralBehavior{
 					from = null;
 					break;
 			}
-			
-			from = System.currentTimeMillis() / 1000 - from;
 		}
 		
 		responseProperties = 
-			codeforcesInfo.Methods.getSubmissions(handle, from, show, verdict, 
+			codeforcesInfo.Methods.getSubmissions(handle, from, count, verdict, 
 			requestProperties.get("tags"));
 		
 		String banner = "Submissions of " + handle;
 		if(verdict != null)	banner += ", with verdict of " + verdict;
 		if(time != null) banner += ", from " + time + " ago";
-		if(requestProperties.get("tags") != null && requestProperties.get("tags").isEmpty() == false){
-			banner += ", with tags of ";
-			
-			for(int i = 0; i < requestProperties.get("tags").size(); i++){
-				banner += requestProperties.get("tags").get(i);
-				if( i < requestProperties.get("tags").size() - 1 )
-					banner += ", ";
-			}
-		}
-		
 		banner += ":\n";
 		
-		if( responseProperties.get("text").isEmpty() ){
-			responseProperties.put("text", banner + "No results.");
+		if(!responseProperties.get("text").isEmpty()){
+			responseProperties.put("text", banner + responseProperties.get("text"));
 		}
 		else{
-			responseProperties.put("text", banner + responseProperties.get("text"));
+			responseProperties.put("text", banner + "No results.");
 		}
 		
 		return responseProperties;

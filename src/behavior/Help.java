@@ -10,6 +10,7 @@ public class Help extends GeneralBehavior{
 			"Available commands:\n"
 			+ "    echo                                 Repeats what you write.\n"
 			+ "    submissions                          Show submissions of an user.\n"
+                        + "    contestants                          Get information about a student\n"
 			+ "    help                                 Displays this help text.\n"
 			+ "For more info about a specific command, run help <command>.";
 	
