@@ -17,7 +17,6 @@ public class Bot {
 	}
 	
 	public static void work(Map<String, String[]> requestProperties) throws InterruptedException{
-		
 		if(requestProperties.get("text") == null)
 			return;
 		
@@ -34,27 +33,11 @@ public class Bot {
 		reqProperties.get("text").set(0,
 			reqProperties.get("text").get(0).replaceFirst(command+"[ \t]*", ""));
 		command = command.toLowerCase();
-                UserInteraction instancia = new UserInteraction();
-                instancia.prepareInfo(reqProperties);
-                Thread t1 = new Thread(instancia);
                   
 		
-		if(GeneralStuff.commands.get(command) != null){
-                    t1.start();
-                    try{
-                        GeneralStuff.commands.get(command).execute(reqProperties);
-                    }catch(Exception e){
-                        e.printStackTrace();
-                        
-                        instancia.notifyError();
-                        
-                    }
-                    finally{
-                        
-                        instancia.killThread();
-                        t1.join();
-                    }
-                }
+		if(GeneralStuff.COMMANDS.get(command) != null){
+			GeneralStuff.COMMANDS.get(command).execute(reqProperties);
+		}
 		else
 			GeneralStuff.commands.get("help").execute(reqProperties);
 	}
@@ -65,8 +48,8 @@ public class Bot {
 		
 		String[] x = new String[1];
 		Map<String, String[]> h = new HashMap<String, String[]>();
-		
-		x[0] = "submissions --by kojak_";
+
+		x[0] = "submissions --by angelg2095 --show 860";
 		h.put("text", x.clone());
 		
 		x[0] = "privategroup";

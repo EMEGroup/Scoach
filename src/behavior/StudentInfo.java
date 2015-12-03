@@ -98,6 +98,8 @@ public class StudentInfo extends GeneralBehavior {
                 return responseProperties;
 
             }
+            responseProperties.put("text", makeReport(StudentData));
+            return responseProperties;
 
             //------------------------------------------------------------------------------------------
             if (requestProperties.get("group") != null) {

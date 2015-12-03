@@ -1,5 +1,6 @@
 package behavior;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,7 +19,7 @@ public class Submissions extends GeneralBehavior{
 		+ "\t\t\t\t\t\tresult in a fewer amount of shown submissions. Default is 1.";
 	
 	@Override
-	public Map<String, String> Run(Map<String, List<String>> requestProperties) {
+	public Map<String, String> Run(Map<String, List<String>> requestProperties) throws IOException{
 		
 		String handle;
 		String time = null;
@@ -28,8 +29,8 @@ public class Submissions extends GeneralBehavior{
 		
 		Map<String, String> responseProperties;
 		
-		if(requestProperties.get("by") != null){
-			handle = requestProperties.get("by").get(0);
+		if(requestProperties.get("--by") != null){
+			handle = requestProperties.get("--by").get(0);
 		}
 		else{
 			responseProperties = new HashMap<String, String>();
@@ -37,16 +38,26 @@ public class Submissions extends GeneralBehavior{
 			return responseProperties;
 		}
 		
-		if(requestProperties.get("verdict") != null){
-			verdict = requestProperties.get("verdict").get(0);
+		if(requestProperties.get("--verdict") != null){
+			verdict = requestProperties.get("--verdict").get(0);
 		}
 		
+<<<<<<< HEAD
 		if(requestProperties.get("count") != null){
 			count = Integer.parseInt(requestProperties.get("count").get(0));
+=======
+		if(requestProperties.get("--show") != null){
+			if( !requestProperties.get("--show").get(0).isEmpty() )
+				show = Integer.parseInt(requestProperties.get("--show").get(0));
 		}
 		
-		if(requestProperties.get("since") != null){
-			time = requestProperties.get("since").get(0);
+		if(requestProperties.get("--all") != null){
+			show = null;
+>>>>>>> master
+		}
+		
+		if(requestProperties.get("--since") != null){
+			time = requestProperties.get("--since").get(0);
 			from = Long.parseLong( time.substring(0, time.length()-1) );
 			
 			switch( time.charAt(time.length()-1) ){
@@ -69,12 +80,30 @@ public class Submissions extends GeneralBehavior{
 		}
 		
 		responseProperties = 
+<<<<<<< HEAD
 			codeforcesInfo.Methods.getSubmissions(handle, from, count, verdict, 
 			requestProperties.get("tags"));
+=======
+			codeforcesInfo.Methods.getSubmissions(handle, from, show, verdict, 
+			requestProperties.get("--tags"));
+>>>>>>> master
 		
 		String banner = "Submissions of " + handle;
 		if(verdict != null)	banner += ", with verdict of " + verdict;
 		if(time != null) banner += ", from " + time + " ago";
+<<<<<<< HEAD
+=======
+		if(requestProperties.get("--tags") != null && requestProperties.get("--tags").isEmpty() == false){
+			banner += ", with tags of ";
+			
+			for(int i = 0; i < requestProperties.get("--tags").size(); i++){
+				banner += requestProperties.get("--tags").get(i);
+				if( i < requestProperties.get("--tags").size() - 1 )
+					banner += ", ";
+			}
+		}
+		
+>>>>>>> master
 		banner += ":\n";
 		
 		if(!responseProperties.get("text").isEmpty()){
