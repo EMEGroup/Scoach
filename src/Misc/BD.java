@@ -5,15 +5,10 @@
  */
 package Misc;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.math.BigDecimal;
 import java.sql.*;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.List;
 
 /**
  *
@@ -51,11 +46,10 @@ public class BD {
                     + "estudiante.coach = coach.id_Coach";
 
         } else if (specify.toLowerCase().compareTo("user") == 0) {
-            sql = "select Estudiante.username as user , Estudiante.nombre,Estudiante.apellido, Estudiante.fecha_nacimiento, Estudiante.fecha_ingreso,  Grado.tipo ,  Coach. Nombre as SNOMBRE, coach.apellido as SAPELLIDO \n"
-                    + "from estudiante, grado, coach, Estudiante_Juez \n"
-                    + "where  estudiante.id_estudiante  = Estudiante_Juez.id_estudiante AND  \n"
-                    + "grado.id_grado = estudiante.grado AND estudiante.coach = coach.id_coach AND\n"
-                    + "estudiante.USERNAME = '" + est + "';";
+            sql = "	select Estudiante.username as user , Estudiante.nombre as nombre,Estudiante.apellido as apellido , Estudiante.fecha_nacimiento as Fecha_nacimiento, Estudiante.fecha_ingreso as Fecha_ingreso,\n" +
+                        "Grado.tipo as tipo,  Coach. Nombre as SNOMBRE, coach.apellido as SAPELLIDO from estudiante, grado, coach\n" +
+                        " where\n" +
+                        "grado.id_grado = estudiante.grado AND estudiante.coach = coach.id_coach AND estudiante.USERNAME = '"+est+"';;";
         }
 
         Statement stmt = con.createStatement();
@@ -118,9 +112,42 @@ public class BD {
         return Info;
     }
 
-    public void addStudent() {
+    public void addStudent(ArrayList<String> studentData) throws ClassNotFoundException, SQLException
+    {
+        Class.forName("org.postgresql.Driver");
+
+            Connection con = DriverManager.getConnection("jdbc:postgresql://127.10.65.2:5432/scoach",
+                    "admin7wbaict", "Exf6tmuYJXWh");
+            con.setAutoCommit(false);
+            String sql = "INSERT INTO Estudiante (username, nombre, apellido, fecha_nacimiento, fecha_ingreso,grado,coach)\n" +
+                        " VALUES ('" + studentData.get(0) + "' ,'" + studentData.get(1) +
+                        "','" + studentData.get(2) + "', '" + studentData.get(3) + "', current_date , 1, 1\n" +
+                        ")";
+            Statement stmt = con.createStatement();
+            stmt.executeUpdate(sql);
+            con.commit();
+            stmt.close();
+            con.close();
+        
 
     }
+    public void rmStudent(String student) throws ClassNotFoundException, SQLException
+    {
+        Class.forName("org.postgresql.Driver");
+
+            Connection con = DriverManager.getConnection("jdbc:postgresql://127.10.65.2:5432/scoach",
+                    "admin7wbaict", "Exf6tmuYJXWh");
+            con.setAutoCommit(false);
+
+            String sql = "delete from estudiante where username = '" + student + "';";   
+            Statement stmt = con.createStatement();
+            stmt.executeUpdate(sql);
+            con.commit();
+            stmt.close();
+            con.close();
+
+    }
+    
 
     public ArrayList<String> getStudentsInGroup(String group) throws SQLException, ClassNotFoundException {
         Class.forName("org.postgresql.Driver");
@@ -228,32 +255,51 @@ public class BD {
         return studF;
     }
 
-    /*public ArrayList<String> filterStudentsGroup(String group, ArrayList<String> students) throws SQLException {
-     ArrayList<String> tabla = new ArrayList<>();
+    public List<String> filterStudentsGroup(String group, List<String> students) throws SQLException, ClassNotFoundException {
+        List<String> tabla = new ArrayList<>();
+        Class.forName("org.postgresql.Driver");
 
+        Connection con = DriverManager.getConnection("jdbc:postgresql://127.10.65.2:5432/scoach",
+                "admin7wbaict", "Exf6tmuYJXWh");
+        con.setAutoCommit(false);
         
+        
+        for (String s : students) {
+            ResultSet rs;
+            Statement stmt;
+            String sql = "select Estudiante.username \n"
+                    + "from Estudiante, grupo, grupo_Estudiante\n"
+                    + "where \n"
+                    + "Estudiante.username = '" + s + "' AND\n"
+                    + " Estudiante.id_Estudiante = Grupo_Estudiante.ID_Estudiante AND\n"
+                    + "Grupo.Nombre = Grupo_Estudiante.Nombre_Grupo AND\n"
+                    + "Grupo.Nombre = '" + group + "' ";
 
-     for (String s : students) {
-     String sql = "select Estudiante.username, Estudiante.Nombre , Estudiante.Apellido\n"
-     + "from Estudiante, grupo, grupo_Estudiante\n"
-     + "where \n"
-     + "Estudiante.username = "+ s +"AND"
-     + "Estudiante.id_Estudiante = Grupo_Estudiante.ID_Estudiante AND\n"
-     + "Grupo.Nombre = Grupo_Estudiante.Nombre_Grupo AND\n"
-     + "Grupo.Nombre = '" + group + "' ";
-     ResultSet rs;
-     stmt = con.createStatement();
-     rs = stmt.executeQuery(sql);
-     while (rs.next()) {
-     tabla.add(rs.getString("user"));
-     }
-     }
+            
+            stmt = con.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
+                            ResultSet.CONCUR_READ_ONLY);
 
-     rs.close();
-     stmt.close();
+            rs = stmt.executeQuery(sql);
+            
+            
+            int rowcount = 0;
+                if (rs.last()) {
+                  rowcount = rs.getRow();
+                  rs.beforeFirst(); // not rs.first() because the rs.next() below will move on, missing the first element
+                }
+                if(rowcount !=0)
+                    continue;
+            
+                tabla.add(s);
 
-     return tabla;
-     }*/
+            rs.close();
+            stmt.close();
+        }
+
+
+        return tabla;
+    }
+
     public int getStudentID(String s) throws SQLException, ClassNotFoundException {
 
         Class.forName("org.postgresql.Driver");
@@ -297,20 +343,20 @@ public class BD {
         stmt.close();
 
         con.close();
-    }
+    }   
 
-    public void insertGroupStudents(String group, ArrayList<String> students) throws SQLException, ClassNotFoundException {
-        Class.forName("org.postgresql.Driver");
+    public void insertGroupStudents(String group, List<String> students) throws SQLException, ClassNotFoundException {
 
         String sql = "";
 
         for (String s : students) {
+            Class.forName("org.postgresql.Driver");
 
             Connection con = DriverManager.getConnection("jdbc:postgresql://127.10.65.2:5432/scoach",
                     "admin7wbaict", "Exf6tmuYJXWh");
             con.setAutoCommit(false);
 
-            sql = "insert into grupo_estudiante values( '" + group + "' , " + getStudentID(s) + " )";
+            sql = "insert into grupo_estudiante values( '" + group.toLowerCase() + "' , " + String.valueOf(getStudentID(s)) + " )";
             Statement stmt = con.createStatement();
             stmt.executeUpdate(sql);
             con.commit();

@@ -1,10 +1,11 @@
 package codeforcesInfo;
 
-import Misc.GeneralStuff;
+import com.google.gson.Gson;
+import com.google.gson.stream.JsonReader;
+import httpHandling.HttpRequest;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -158,13 +159,7 @@ public class Methods {
 	}
 	
 	public static Map<String, String> getSubmissions(String handle, 
-		Long startingTime, Integer count, String verdict, List<String> tags) throws IOException{
-		
-		int bufferStep = 1000;	// How many submissions to query every request
-		String submissionsUrl;
-		Map<String, String> returnObject;
-		List<Submission> submissionsInRange = new ArrayList<Submission>();
-		returnObject = new HashMap<String, String>();
+		Long startingTime, int count, String verdict, List<String> tags){
 		
 		if(handle == null || handle.isEmpty())	return null;
 		
@@ -301,32 +296,9 @@ public class Methods {
 				
 				conn.disconnect();
 				
-				startingId += tmpSubmissions.result.size();
-				bufferCount = (count == null) ? bufferStep : 
-					Math.min(bufferStep, count - startingId + 1);
-				
-				// This is the rest of submissions, no more to be found.
-				if(tmpSubmissions.result.size() < bufferStep)	break;
-			}
-		}
-		
-		// Sort based on the Submission.compareTo method.
-		// The submissions will be arranged from oldest to newest
-		Collections.sort(submissionsInRange);
-		
-		if(startingTime != null){
-			// Find the very first submission within the time range
-			int firstIndex = 0;
-			
-			Comparator<Submission> comparator = new Comparator<Submission>() {
-				@Override
-				public int compare(Submission t, Submission t1) {
-					if( t.getCreationTimeSeconds() < t1.getCreationTimeSeconds())
-						return -1;
-					else if(t.getCreationTimeSeconds() == t1.getCreationTimeSeconds())
-						return 0;
-					else
-						return 1;
+				if(lastSubmission.result.size() <= 0){
+					id -= 1000;
+					break;
 				}
 				
 				id += lastSubmission.result.size();

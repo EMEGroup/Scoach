@@ -6,19 +6,14 @@
 package behavior;
 
 import Misc.BD;
-import static behavior.StudentInfo.HELPTEXT;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.sql.*;
-import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -47,12 +42,8 @@ public class Group extends GeneralBehavior {
         try {
             BD basedato = new BD();
 
-            Map<String, ArrayList<String>> map = _getArgumentsGroup(requestProperties);
-            if (map == null) {
-                responseProperties.put("text", "Request Mistyped");
-                return responseProperties;
-            }
-            Iterator it = map.entrySet().iterator();
+            
+            Iterator it = requestProperties.entrySet().iterator();
             while (it.hasNext()) {
 
                 Map.Entry pair = (Map.Entry) it.next();
@@ -61,8 +52,8 @@ public class Group extends GeneralBehavior {
 
                 String group = (String) pair.getKey();
                 group = group.toLowerCase();
-                ArrayList<String> students = (ArrayList<String>) pair.getValue();
- //answer += "\nGroup: \"" + group + "\" - Students:" + students+ " \n";
+                List<String> students = (List<String>) pair.getValue();
+                 //answer += "\nGroup: \"" + group + "\" - Students:" + students+ " \n";
 
                 if (!basedato.GroupExists(group)) {
                     basedato.createGroup(group);
@@ -72,7 +63,6 @@ public class Group extends GeneralBehavior {
                 }
                 answer += "\nGroup: \"" + group + "\" - Students:" + students + " \n";
 
-//                answer += students.size();
                 //Looking for the students
                 studNotEx = "The students :\n";
                 for (String student : students) {
@@ -86,69 +76,33 @@ public class Group extends GeneralBehavior {
                     }
                 }
                 studNotEx += " Were Not Found";
+                
+                answer += "\nThe students found : "+ MyStudents + "\n";
+                List<String> FinalStudents = basedato.filterStudentsGroup(group, MyStudents);
+                answer += "Students not found in group " + Arrays.asList(FinalStudents) + "\n";
 
-                answer += "\nInserting\n";
+                basedato.insertGroupStudents(group, FinalStudents);
+                
 
-                basedato.insertGroupStudents(group, MyStudents);
-
-                answer += "\n";
             }
-
-            answer += "\nAll Done!\n";
+            //answer += "\nAll Done!\n";
         } catch (Exception e) {
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
             e.printStackTrace(pw);
 
-            System.out.println(sw.toString());
+            System.out.println("Error!!!! \n" + sw.toString()+ "Error!!!! \n" );
 
         }
         if (NotFM) {
             answer += studNotEx;
         }
-        answer += "\nDone!\n";
+        answer += "\nAll Done!\n";
 
         responseProperties.put("text", answer);
-        System.out.println(answer);
 
         return responseProperties;
 
     }
-
-    public Map<String, ArrayList<String>> _getArgumentsGroup(Map<String, List<String>> requestProperties) {
-        Map<String, ArrayList<String>> args = new HashMap<String, ArrayList<String>>();
-
-        String text = "";
-
-        if (requestProperties.get("text") != null) {
-            if (requestProperties.get("text").get(0) != null) {
-
-                text = requestProperties.get("text").get(0);
-            }
-        }
-        String group = text.split(" ")[0];
-
-        Pattern argPat = Pattern.compile(group + ".*");
-
-        Matcher argsMatcher = argPat.matcher(text);
-
-        String argument, key;
-        String[] values;
-
-        argsMatcher.find();
-
-        argument = argsMatcher.group();
-        argument = argument.trim();
-
-        if (!argument.contains(" ")) {
-            return null;
-        }
-
-        key = argument.substring(0, argument.indexOf(" "));
-        values = argument.replaceFirst(key + "[ ]+", "").split("([ ]*[,]+[ ]*)+");
-
-        args.put(group, new ArrayList<String>(Arrays.asList(values)));
-
-        return args;
-    }
+  
 }
