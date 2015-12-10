@@ -106,13 +106,34 @@ public class Commands {
 		String text = result.get("text");
 		requestProperties.put("text", Arrays.asList(new String[]{text}));
 		System.out.println(text);
+	}
+        
+	public void recommendations(Map<String, List<String>> requestProperties) throws Exception{
+		Recommendations _recommendations = new Recommendations();
+		UnitofInteraction talking = new UnitofInteraction(requestProperties);
+		talking.startThread();
+		
+		Map<String, String> result = null;
+                
+		try {
+			result = _recommendations.Run( GeneralStuff._getArguments(requestProperties) );
+		} catch (IOException ex) {
+			talking.notifyError();
+			talking.stopThread();
+		}
+                
+		talking.stopThread();
+		
+		String text = result.get("text");
+		requestProperties.put("text", Arrays.asList(new String[]{text}));
+		
 		try {
 			GeneralStuff._sendMessage( GeneralStuff._forgeMessage(requestProperties) );
 		} catch (IOException ex) {
 			Logger.getLogger(Commands.class.getName()).log(Level.SEVERE, null, ex);
 		}
 	}
-	
+
 	private class UnitofInteraction{
 		Thread thread;
 		UserInteraction instance;
