@@ -61,6 +61,16 @@ public class GeneralStuff {
 			@Override
 			public void execute(Map<String, List<String>> req){ C.compare(req); }
 		});
+                
+		COMMANDS.put("help", new Command(){
+			@Override
+			public void execute(Map<String, List<String>> req){
+				try {
+					C.recommendations(req);
+				} catch (Exception ex) {
+					Logger.getLogger(GeneralStuff.class.getName()).log(Level.SEVERE, null, ex);
+				}
+		}});
 	}
 	
 	private static GeneralStuff self = null;
