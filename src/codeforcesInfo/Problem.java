@@ -3,7 +3,7 @@ package codeforcesInfo;
 import codeforcesInfo.Methods.ProblemType;
 import java.util.List;
 
-public class Problem {
+public class Problem{
 	
 	private int contestID;
 	private String index;

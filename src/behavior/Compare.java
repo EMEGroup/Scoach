@@ -10,14 +10,16 @@ import java.util.Map;
 public class Compare extends GeneralBehavior {
 	
 	public static final String HELPTEXT = 
-		"Compare:  Displays a brief report of the performance of a list of contestants.\n"
+		"```"
+		+ "Compare:  Displays a brief report of the performance of a list of contestants.\n"
 		+ "USAGE:\n"
 		+ "compare [--since <TIME_AGO> ] (--team <TEAM_NAME> | --nicks <USER_NAME, USER_NAME, ...>)\n"
 		+ "USER_NAME           then name of one contestant\n"
 		+ "TEAM_NAME           the name of the team\n"
 		+ "TIME_AGO            a number followed by a letter describing the amount of time"
 		+ " used as the starting point for the comparison, e.g: '1d' for one day, '7m' for seven months, etc ... supports days('d'), weeks('w'), months('m'), years('y').\n"
-		+ "NOTE: Months are being treated as 30 days intervals.";
+		+ "NOTE: Months are being treated as 30 days intervals."
+		+ "```";
 	
 	private final static String[] VERDICTS = 
 		{"AC", "PE", "WA", "TLE", "RTE", "MLE", "CE", "HACKED"};
@@ -82,7 +84,7 @@ public class Compare extends GeneralBehavior {
 			startingTime = System.currentTimeMillis() / 1000 - startingTime;
 		}
 		
-		String text = "Comparing ";
+		String text = "```Comparing ";	// Monospaced block of code or text
 		
 		for(int i = 0; i < handles.size(); i++){
 			text += handles.get(i);
@@ -95,7 +97,6 @@ public class Compare extends GeneralBehavior {
 		} else{
 			text += " for all of their submissions:\n";
 		}
-			
 		
 		text += "Username ";
 		
@@ -111,6 +112,9 @@ public class Compare extends GeneralBehavior {
 			for(int i = 0; i < 11 - v.length(); i++)
 				text += " ";
 		}
+		text += "\n";
+		
+		for(int i = 0; i < 132; i++) text += "-";	// Title line
 		text += "\n";
 		
 		for(String handle : handles){
@@ -132,20 +136,21 @@ public class Compare extends GeneralBehavior {
 				text += " ";
 			text += " ";
 			
-			for(int i = 0; i < VERDICTS.length; i++){
+			for(String ver : VERDICTS){
 				
-				String tmp = String.valueOf(summary.get(VERDICTS[i]));
+				String tmp = String.valueOf(summary.get(ver));
 				
 				text += tmp;
 				
 				for(int j = 0; j < 11 - tmp.length(); j++)
 					text += " ";
-				
 			}
 			
 			text += "\n";
 			
 		}
+		
+		text += "```";		// End of monospaced block of code or text
 		
 		returnObject.put("text", text);
 		return returnObject;

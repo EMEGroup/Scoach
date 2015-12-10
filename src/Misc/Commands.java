@@ -88,7 +88,7 @@ public class Commands {
 		GeneralStuff._sendMessage( GeneralStuff._forgeMessage(requestProperties) );
 	}	
     
-	public void compare(Map<String, List<String>> requestProperties){
+	public void compare(Map<String, List<String>> requestProperties) {
 		Compare _compare = new Compare();
 		UnitofInteraction talking = new UnitofInteraction(requestProperties);
 		talking.startThread();
@@ -106,6 +106,12 @@ public class Commands {
 		String text = result.get("text");
 		requestProperties.put("text", Arrays.asList(new String[]{text}));
 		System.out.println(text);
+		
+		try {
+			GeneralStuff._sendMessage( GeneralStuff._forgeMessage(requestProperties) );
+		} catch (IOException ex) {
+			Logger.getLogger(Commands.class.getName()).log(Level.SEVERE, null, ex);
+		}
 	}
         
 	public void recommendations(Map<String, List<String>> requestProperties) throws Exception{

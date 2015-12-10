@@ -5,7 +5,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -187,30 +189,148 @@ public class Methods {
 		List<Submission> submissionsInRange = 
 			getSubmissions(handle, startingTime, count, verdict, tags);
 		
-		String text = "";
+		class CollapsedSubmission{
+			// This class is a work around due to the java's lack of a 
+			// general and simple Pair class or object ... 
+			public Integer quantity;
+			public Submission submission;
+			public CollapsedSubmission(Integer _quantity, Submission _submission){
+				this.quantity = _quantity;
+				this.submission = _submission;
+			}
+		}
 		
-		// Assemble the response message if there are submissions to return ...
-		if( submissionsInRange.isEmpty() == false ){
-			String columnIDs = "ID | " +"PROBLEM NAME | " + "PROBLEM INDEX | " 
-				+ "EXECUTION TIME | " + "USED MEMORY | " + "VERDICT | " + "LINK\n";
-
-			for( int i = 0; i < submissionsInRange.size(); i++){
-				Submission sub = submissionsInRange.get(i);
+		// This map holds the info ready to be returned/printed
+		EnumMap<ProblemVerdict, List<CollapsedSubmission>> summarizedMap = 
+			new EnumMap<ProblemVerdict, 
+				List<CollapsedSubmission>>(ProblemVerdict.class);
+		
+		// *** Group by verdict ***
+		EnumMap<ProblemVerdict, List<Submission>> agrupationMap = 
+			new EnumMap<ProblemVerdict, List<Submission>>(ProblemVerdict.class);
+		
+		// Ensure there's no null list inside the EnumMaps
+		for(ProblemVerdict pv : ProblemVerdict.values()){
+			agrupationMap.put(pv, new ArrayList<Submission>());
+			summarizedMap.put(pv, new ArrayList<CollapsedSubmission>());
+		}
+		
+		// Add every submission to it's corresponding verdict
+		for(Submission sub : submissionsInRange)
+			agrupationMap.get(sub.getVerdict()).add(sub);
+		
+		// *** Collapse the submissions by problem and count them ***
+		// For each verdict, sort from newest to oldest, count the amount of
+		// submissions of each problem and keep only the newest submission.
+		
+		Iterator<ProblemVerdict> it = agrupationMap.keySet().iterator();
+		
+		while( it.hasNext() ){
+			ProblemVerdict pv = it.next();
+			List<Submission> tmpList = agrupationMap.get(pv);
+			
+			// *** Sort by the list from newest to oldest ***
+			Collections.sort(tmpList);
+			
+			for(int i = 0; i < tmpList.size(); i++){
+				int cant = 1;
 				
-				columnIDs +=
-					"[" + (i+1) + "]  " +
-					"[" + sub.getProblem().getName() + "]\t" + 
-					"[" + sub.getProblem().getIndex() + "] " +
-					"[" + sub.getTimeConsumedMillis() + "ms] " +
-					"[" + sub.getMemoryConsumedBytes() + "B] " +
-					"[" + sub.getVerdict().getValue() + "] " +
-					"[" + PROBLEMSURL + sub.getContestId() + "/" + sub.getProblem().getIndex() + "]";
-
-				columnIDs += "\n";
+				for(int j = i+1; j < tmpList.size(); j++){
+					String FirstSubName = 
+						tmpList.get(i).getProblem().getName();
+					String SecondSubName = 
+						tmpList.get(j).getProblem().getName();
+					
+					if( FirstSubName.equals(SecondSubName) ){
+						cant++;
+						tmpList.remove(j);
+						j--;
+					}
+					
+				}
+				
+				// Add the now summarized submission to the final map,
+				// no need since it was sorted before and the iteration
+				// follows the natural order 
+				summarizedMap.get(pv).add( 
+					new CollapsedSubmission(cant, tmpList.get(i)) );
+				
 			}
 			
-			text += columnIDs;
-			text += "END OF LIST.";
+		}
+		
+		// *** Print the verdict and the count of each submissions ***
+		// Assemble the response message if there are submissions to return ...
+		
+		String text = "";
+		if( submissionsInRange.isEmpty() == false ){
+			
+			String columnIDs = "CANT | " + "PROBLEM NAME ";
+			
+			// String formatting stuff ...
+			for(int i = 0; i < 30 - "PROBLEM NAME ".length(); i++)
+				columnIDs += " ";
+			
+			columnIDs += "| PROBLEM INDEX | " + "TAGS | " + "LINK\n";
+			
+			for(int i = 0; i < 70; i++)	
+				columnIDs += "-";	// Title divisor line
+			columnIDs += "\n";
+			
+			String textBody = "";
+			for(ProblemVerdict pv : summarizedMap.keySet()){
+				if( summarizedMap.get(pv).isEmpty() )	continue;
+				
+				// Print the verdict
+				for(int i = 0; i < 55; i++) textBody += "*";
+				textBody += " " + pv.getValue() + " ";
+				
+				for(int i = 0; i < 55 - pv.getValue().length(); i++) 
+					textBody += "*";
+				textBody += "\n";
+				
+				// Print it's submissions
+				for( CollapsedSubmission cs : summarizedMap.get(pv) ){
+
+					textBody +=
+						"[" + cs.quantity + "]";
+					
+					// String formatting stuff ...
+					for(int x = 0; x < 4 - cs.quantity.toString().length(); x++)
+						textBody += " ";
+					textBody += " ";
+					
+					textBody += "[" + cs.submission.getProblem().getName() + "]";
+						
+					// Some string formatting stuff ...
+					for(int i = 0; i < 30 - cs.submission.getProblem().getName().length(); i++)
+						textBody += " ";
+					
+					textBody +=
+						"[" + cs.submission.getProblem().getIndex() + "] ";
+
+					textBody += "[";
+					List<String> _tags = cs.submission.getProblem().getTags();
+					for(int j = 0; j < _tags.size(); j++){
+						String tag = _tags.get(j);
+						textBody += tag;
+
+						if( j < _tags.size()-1 )
+							textBody += ", ";
+					}
+					textBody += "] ";
+
+					textBody += 
+						"[" + PROBLEMSURL + cs.submission.getContestId() +
+						"/" + cs.submission.getProblem().getIndex() + "]";
+
+					textBody += "\n";
+				}
+			}
+			
+			textBody += "END OF LIST.";
+			
+			text = columnIDs + textBody;		
 		}
 
 		returnObject.put("text", text);
@@ -277,7 +397,7 @@ public class Methods {
 			while(true){
 				
 				if( count != null ){
-					if(startingId >= count) break;
+					if(startingId > count) break;
 				}
 				
 				tmpSubmissions = GeneralStuff.getResponseObject(
@@ -320,7 +440,7 @@ public class Methods {
 		}
 		
 		// Sort based on the Submission.compareTo method.
-		// The submissions will be arranged from oldest to newest
+		// The submissions will be arranged from newest to oldest
 		Collections.sort(submissionsList);
 		
 		if(startingTime != null){
@@ -329,10 +449,10 @@ public class Methods {
 			
 			Comparator<Submission> comparator = new Comparator<Submission>() {
 				@Override
-				public int compare(Submission t, Submission t1) {
-					if( t.getCreationTimeSeconds() < t1.getCreationTimeSeconds())
+				public int compare(Submission t1, Submission t2) {
+					if( t1.getCreationTimeSeconds() > t2.getCreationTimeSeconds())
 						return -1;
-					else if(t.getCreationTimeSeconds() == t1.getCreationTimeSeconds())
+					else if(t1.getCreationTimeSeconds() == t2.getCreationTimeSeconds())
 						return 0;
 					else
 						return 1;
@@ -351,7 +471,10 @@ public class Methods {
 			}
 			
 			// Get rid of the submissions laying outside of the time range
-			submissionsList = submissionsList.subList(firstIndex, submissionsList.size());
+			submissionsList = submissionsList.subList(0, firstIndex);
+			
+			// Reverse the order so you start at the oldest one inside the time range
+			Collections.reverse(submissionsList);
 		}
 		
 		// Filter by verdict, tags, etc ...
@@ -374,16 +497,14 @@ public class Methods {
 			i++;
 		}
 		
-		// Just work over the last <count> submissions, since those are the 
-		// required by the caller and reverse their order so the oldest one is
-		// at the beginning of the list, omit if --all was passed (count == null)
+		// Return only the last <count> submissions, since those are the 
+		// required by the caller, omit if --all was passed (count == null)
 		
-		if( count != null ){
-			submissionsList = submissionsList.subList(0, Math.max(0, Math.min(submissionsList.size(), count)));
-		}
+		if( count != null )
+			submissionsList = submissionsList.subList(0, 
+				Math.max(0, Math.min(submissionsList.size(), count)));
 		
 		return submissionsList;
-		
 	}
 	
 	private static <T> int _lowerBound(List<T> arr, T val, Comparator<T> comparator){
