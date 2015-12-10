@@ -106,7 +106,7 @@ public class Submission implements Comparable<Submission>{
 
 	@Override
 	public int compareTo(Submission t) {
-		if(this.id < t.id)
+		if(this.id > t.id)
 			return -1;
 		else if(this.id == t.id)
 			return 0;

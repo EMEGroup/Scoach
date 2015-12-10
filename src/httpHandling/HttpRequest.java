@@ -2,6 +2,7 @@ package httpHandling;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import javax.net.ssl.HttpsURLConnection;
@@ -9,13 +10,35 @@ import javax.net.ssl.HttpsURLConnection;
 public class HttpRequest {
 	private final String addr;
 	private URL url = null;
-	private HttpsURLConnection connection = null;
+	private HttpURLConnection connection = null;
     
 	public HttpRequest(String address) throws MalformedURLException, IOException{
-		addr = address;
 		
 		url = new URL(address);
-		this.connection = (HttpsURLConnection) url.openConnection();
+		
+		if( url.getProtocol().equals("HTTPS") )
+			this.connection = (HttpsURLConnection) url.openConnection();
+		else
+			this.connection = (HttpURLConnection) url.openConnection();
+		
+		this.connection.setDoOutput(true);
+		this.connection.setDoInput(true);
+		
+		if( this.connection.getResponseCode() == 301 ){
+			addr = this.connection.getHeaderField("Location");
+		} else{
+			addr = address;
+		}
+		
+		this.connection.disconnect();
+
+		url = new URL(addr);
+		
+		if( url.getProtocol().equals("HTTPS") )
+			this.connection = (HttpsURLConnection) url.openConnection();
+		else
+			this.connection = (HttpURLConnection) url.openConnection();
+		
 		this.connection.setDoOutput(true);
 		this.connection.setDoInput(true);
 	}
@@ -36,7 +59,7 @@ public class HttpRequest {
 		return url.getHost() + url.getFile() + url.getQuery();
 	}
 
-	public HttpsURLConnection getConnection() {
+	public HttpURLConnection getConnection() {
 		return connection;
 	}
 	

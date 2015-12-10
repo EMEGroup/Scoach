@@ -6,7 +6,10 @@ import java.util.Map;
 
 public class Echo extends GeneralBehavior {
 	
-	public static final String HELPTEXT = "echo <text>\t\t\tRepeats what you write.";
+	public static final String HELPTEXT = 
+		"```" +
+		"echo <text>\t\t\tRepeats what you write." +
+		"```";
 	
 	@Override
 	public Map<String, String> Run(Map<String, List<String>> requestProperties){

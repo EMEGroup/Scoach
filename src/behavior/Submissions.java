@@ -9,6 +9,7 @@ import java.util.Map;
 public class Submissions extends GeneralBehavior{
 	
 	public static final String HELPTEXT = 
+		"```" +
 		"Submissions                          Show submissions of an user.\n"
 		+ "submissions [OPTIONS] --by <codeforces handle of the user>\n" +
 		"OPTIONS:\n" +
@@ -17,7 +18,8 @@ public class Submissions extends GeneralBehavior{
 		"\t--verdict <verdict>\t\t\tVerdict string (AC, WA, TLE ...)\n" +
 		"\t--since <time>('d'|'w'|'m'|'y')\t\tTime of the first submission to show. (days, weeks, months ...)\n" +
 		"\t--show <amount>\t\t\tAmount of submissions to show\n"
-		+ "--all\t\t\t\tShow all submissions, overrides the --show argument.";
+		+ "--all\t\t\t\tShow all submissions, overrides the --show argument."
+		+ "```";
 	
 	@Override
 	public Map<String, String> Run(Map<String, List<String>> requestProperties) throws IOException{
@@ -85,9 +87,8 @@ public class Submissions extends GeneralBehavior{
 			from = System.currentTimeMillis() / 1000 - from;
 		}
 		
-		responseProperties = 
-			codeforcesInfo.Methods.getSubmissionsReport(
-				handle, from, show, verdict, tags);
+		responseProperties = codeforcesInfo.Methods.getSubmissionsReport(
+			handle, from, show, verdict, tags);
 		
 		String banner = "Submissions of " + handle;
 		if(verdict != null)	banner += ", with verdict of " + verdict;
@@ -102,14 +103,25 @@ public class Submissions extends GeneralBehavior{
 			}
 		}
 		
-		banner += ":\n";
+		banner += ":";
+		
+		if( show == null )	// Showing all submissions
+			banner += " Showing all submissions.";
+		else
+			banner += " Showing up to " + show.toString() + " submissions.";
+		
+		banner += "\n";
+		
+		String text;
 		
 		if( responseProperties.get("text").isEmpty() ){
-			responseProperties.put("text", banner + "No results.");
+			text = banner + "No results.";
 		}
 		else{
-			responseProperties.put("text", banner + responseProperties.get("text"));
+			text = banner + responseProperties.get("text");
 		}
+		
+		responseProperties.put("text", "```" + text + "```");
 		
 		return responseProperties;
 		

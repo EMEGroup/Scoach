@@ -17,14 +17,17 @@ import java.util.Set;
  */
 public class StudentInfo extends GeneralBehavior {
 
-    public static final String HELPTEXT = " student             Get information about a student\n"
-            + "--nick                           search by student's nickname on OJ\n"
-            + "--user                           search by student's id\n"
-            + "--name                            search by any name/last name\n"
-            + "--add                             add student \n"
-            + "                                 (args.: StudentsName, StudentsLastName, )  "
-            + "For more info about a specific command, run help <command>.";
-
+    public static final String HELPTEXT = 
+		"```" 
+		+ "student             Get information about a student\n"
+		+ "--nick                           search by student's nickname on OJ\n"
+		+ "--user                           search by student's id\n"
+		+ "--name                            search by any name/last name\n"
+		+ "--add                             add student \n"
+		+ "                                 (args.: StudentsName, StudentsLastName, )  "
+		+ "For more info about a specific command, run help <command>."
+		+ "```";
+	
     @Override
     public Map<String, String> Run(Map<String, List<String>> requestProperties) {
         Map<String, String> responseProperties;

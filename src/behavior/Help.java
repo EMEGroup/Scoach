@@ -7,12 +7,14 @@ import java.util.Map;
 public class Help extends GeneralBehavior{
 
 	public static final String HELPTEXT =
-		"Available commands:\n"
+		"```"
+		+ "Available commands:\n"
 		+ "    echo                                 Repeats what you write.\n"
 		+ "    submissions                          Show submissions of an user.\n"
 		+ "    help                                 Displays this help text.\n"
 		+ "    compare                              Displays a brief report of the performance of a list of contestants.\n"
-		+ "For more info about a specific command, run help <command>.";
+		+ "For more info about a specific command, run help <command>."
+		+ "```";
 	
 	private static final Map<String, String> commandsHelp;
 	
