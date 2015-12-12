@@ -8,6 +8,7 @@ package behavior;
 import Misc.BD;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -86,7 +87,7 @@ public class Group extends GeneralBehavior {
 
             }
             //answer += "\nAll Done!\n";
-        } catch (Exception e) {
+        } catch (SQLException | ClassNotFoundException e) {
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
             e.printStackTrace(pw);

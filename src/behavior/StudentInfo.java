@@ -12,9 +12,8 @@ import java.util.Map;
 import Misc.*;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * @author Ernesto
@@ -26,13 +25,12 @@ public class StudentInfo extends GeneralBehavior {
             + "--user                           search by contestant's username\n"
             + "--name                            search by any name/last name\n"
             + "--add                             add contestant \n"
-            + "                                 (args.: username, contestant'sName, contestant'sLastName,"
-            + "                                         Contestan'sBirthDay (1/dec/2015),  )  "
+            + "                                 (args.: username, contestant'sName, contestant'sLastName,\n"
+            + "                                         Contestan'sBirthDay (1/dec/2015),  ) \n "
             + "--rm                              remove contestant with his username"
             + "For more info about a specific command, run help <command>.";
-    
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////---add NYI
-    
     @Override
     public Map<String, String> Run(Map<String, List<String>> requestProperties) {
         Map<String, String> responseProperties;
@@ -40,15 +38,31 @@ public class StudentInfo extends GeneralBehavior {
         responseProperties.put("text", HELPTEXT);
 
         BD basedato = new BD();
-       
 
         List<String> students = new ArrayList<>();
 
         try {
+            
+//            String bug = "";
+//
+//        Iterator it = requestProperties.entrySet().iterator();
+//        while (it.hasNext()) {
+//
+//            Map.Entry pair = (Map.Entry) it.next();
+//
+//            it.remove(); // avoids a ConcurrentModificationException
+//
+//            String BKey = (String) pair.getKey();
+//
+//            List<String> Bargs = (List<String>) pair.getValue();
+//
+//            bug += BKey + " - " + Bargs + "\n";
+//        }
+//        System.out.println("Salida:\n" + bug);
 
             //----------------------------------------------------------------------------
-            if (requestProperties.get("nick") != null) {
-                for (String s : requestProperties.get("nick")) {
+            if (requestProperties.get("--nick") != null) {
+                for (String s : requestProperties.get("--nick")) {
                     students.add(s);
                 }
                 Map<String, List<String>> StudentData = new HashMap<>();
@@ -64,9 +78,9 @@ public class StudentInfo extends GeneralBehavior {
 
             }
             //------------------------------------------------------------------------------------------
-            if (requestProperties.get("name") != null) {
+            if (requestProperties.get("--name") != null) {
                 //Taking out arguments of name, all the names
-                for (String s : requestProperties.get("name")) {
+                for (String s : requestProperties.get("--name")) {
                     students.add(s);
                 }
 
@@ -83,8 +97,8 @@ public class StudentInfo extends GeneralBehavior {
 
             }
             //------------------------------------------------------------------------------------------
-            if (requestProperties.get("user") != null) {
-                for (String s : requestProperties.get("user")) {
+            if (requestProperties.get("--user") != null) {
+                for (String s : requestProperties.get("--user")) {
                     students.add(s);
                 }
                 Map<String, List<String>> StudentData = new HashMap<>();
@@ -102,19 +116,17 @@ public class StudentInfo extends GeneralBehavior {
             }
 
             //------------------------------------------------------------------------------------------
-            if (requestProperties.get("group") != null) 
-            {
+            if (requestProperties.get("--group") != null) {
                 ArrayList<String> Groups = new ArrayList<>();
                 String report = "";
 
-                for (String s : requestProperties.get("group")) {
+                for (String s : requestProperties.get("--group")) {
                     Groups.add(s);
                 }
                 Map<String, List<String>> StudentData = new HashMap<>();
                 //ArrayList<String> miembros = new ArrayList<>();
 
-                for (String gName : Groups) 
-                {
+                for (String gName : Groups) {
                     report += gName + "\n";
                     for (String SingleStudent : basedato.getStudentsInGroup(gName)) {
                         //Since by id there is only one student, there's no fear of missing more answers
@@ -132,59 +144,52 @@ public class StudentInfo extends GeneralBehavior {
                 responseProperties.put("text", report);
                 return responseProperties;
             }
-            
-                            //----------------------------------------------------------------------------
-                if (requestProperties.get("add") != null) 
-                {
-                    
-                    ArrayList<String> newStudent = new  ArrayList<>();
-                
-                    for (String s : requestProperties.get("add")) 
-                    {
-                        newStudent.add(s);
-                    }
-                    if(newStudent.size()<4)
-                    {
-                        responseProperties.put("text", "No sufficient arguments!\n");
-                        return responseProperties;
-                    }
-                    if(basedato.studentExists(newStudent.get(0)))
-                    {
-                        responseProperties.put("text", "Student already exists!\n");
-                        return responseProperties;
-                        
-                    }
-                    basedato.addStudent(newStudent);
-                
-                    responseProperties.put("text", "Student added!\n");
-                        return responseProperties;
 
+            //----------------------------------------------------------------------------
+            if (requestProperties.get("--add") != null) {
+            System.out.println("\n\n add\n\n");
+                ArrayList<String> newStudent = new ArrayList<>();
+
+                for (String s : requestProperties.get("--add")) {
+                    newStudent.add(s);
                 }
-                //----------------------------------------------------------------------------
-                if (requestProperties.get("rm") != null) 
-                {
-                    String  delStudent =requestProperties.get("rm").get(0);
-                    
-                    if(basedato.studentExists(delStudent))
-                    {
-                        basedato.rmStudent(delStudent);
-                        responseProperties.put("text", "Student deleted!\n");
-                        return responseProperties;
-                    }
-                    
-                    // Converting to string for Printing
-                    responseProperties.put("text", "Student not Found!\n");
+                if (newStudent.size() < 4) {
+                    responseProperties.put("text", "No sufficient arguments!\n");
+                    return responseProperties;
+                }
+                if (basedato.studentExists(newStudent.get(0))) {
+                    responseProperties.put("text", "Student already exists!\n");
                     return responseProperties;
 
                 }
+                basedato.addStudent(newStudent);
 
-            
+                responseProperties.put("text", "Student added!\n");
+                return responseProperties;
+
+            }
+            //----------------------------------------------------------------------------
+            if (requestProperties.get("--rm") != null) {
+                String delStudent = requestProperties.get("--rm").get(0);
+
+                if (basedato.studentExists(delStudent)) {
+                    basedato.rmStudent(delStudent);
+                    responseProperties.put("text", "Student deleted!\n");
+                    return responseProperties;
+                }
+
+                // Converting to string for Printing
+                responseProperties.put("text", "Student not Found!\n");
+                return responseProperties;
+
+            }
+
         } catch (ClassNotFoundException | SQLException ex) {
             responseProperties.put("text", "Problem searching database.");
             return responseProperties;
-        } 
+        }
 
-        responseProperties.put("text", "Nobody found");
+        responseProperties.put("text", HELPTEXT);
 
         return responseProperties;
 
