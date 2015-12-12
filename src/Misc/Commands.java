@@ -87,6 +87,23 @@ public class Commands {
 		
 		GeneralStuff._sendMessage( GeneralStuff._forgeMessage(requestProperties) );
 	}	
+	public void group(Map<String, List<String>> requestProperties)
+        {
+			Group _group= new Group();
+	                
+			Map<String, String> result = 
+				_group.Run( _getArguments(requestProperties));
+			
+			
+			if(result == null) 
+				return;
+			
+			String text= result.get("text");
+	                //System.out.println("\n\n Texto recibido \n"  + text);
+			requestProperties.put("text", Arrays.asList(new String[]{text}));
+			
+			_sendMessage( _forgeMessage(requestProperties) );
+		}
     
 	public void compare(Map<String, List<String>> requestProperties) {
 		Compare _compare = new Compare();
