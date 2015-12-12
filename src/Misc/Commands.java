@@ -86,13 +86,14 @@ public class Commands {
 		requestProperties.put("text", Arrays.asList(new String[]{text}));
 		
 		GeneralStuff._sendMessage( GeneralStuff._forgeMessage(requestProperties) );
-	}	
-	public void group(Map<String, List<String>> requestProperties)
+	}
+		
+	public void group(Map<String, List<String>> requestProperties)throws IOException, InterruptedException
         {
 			Group _group= new Group();
 	                
 			Map<String, String> result = 
-				_group.Run( _getArguments(requestProperties));
+				_group.Run( GeneralStuff._getArguments(requestProperties));
 			
 			
 			if(result == null) 
@@ -102,8 +103,8 @@ public class Commands {
 	                //System.out.println("\n\n Texto recibido \n"  + text);
 			requestProperties.put("text", Arrays.asList(new String[]{text}));
 			
-			_sendMessage( _forgeMessage(requestProperties) );
-		}
+			GeneralStuff._sendMessage( GeneralStuff._forgeMessage(requestProperties) );
+	}
     
 	public void compare(Map<String, List<String>> requestProperties) {
 		Compare _compare = new Compare();
