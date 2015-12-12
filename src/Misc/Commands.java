@@ -9,165 +9,193 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Commands {
-	public void help(Map<String, List<String>> requestProperties){
-		Help _help = new Help();
+
+    public void help(Map<String, List<String>> requestProperties) {
+        Help _help = new Help();
         UnitofInteraction talking = new UnitofInteraction(requestProperties);
-		talking.startThread();
-                
-		Map<String, String> result = _help.Run(requestProperties);
-                
-		talking.stopThread();
-		
-		String text = result.get("text");
-		requestProperties.put("text", Arrays.asList(new String[]{text}));
-		System.out.println(text);
-		try {
-			GeneralStuff._sendMessage( GeneralStuff._forgeMessage(requestProperties) );
-		} catch (IOException ex) {
-			Logger.getLogger(Commands.class.getName()).log(Level.SEVERE, null, ex);
-		}
-	}
-	
-	public void echo(Map<String, List<String>> requestProperties){
-		Echo _echo = new Echo();
-		UnitofInteraction talking = new UnitofInteraction(requestProperties);
-		talking.startThread();
-		
-		Map<String, String> result = _echo.Run(requestProperties);
-                
-		talking.stopThread();
-		
-		String text = result.get("text");
-		requestProperties.put("text", Arrays.asList(new String[]{text}));
-		
-		try {
-			GeneralStuff._sendMessage( GeneralStuff._forgeMessage(requestProperties) );
-		} catch (IOException ex) {
-			Logger.getLogger(Commands.class.getName()).log(Level.SEVERE, null, ex);
-		}
-	}
-	
-	public void submissions(Map<String, List<String>> requestProperties){
-		Submissions _submissions = new Submissions();
-		UnitofInteraction talking = new UnitofInteraction(requestProperties);
-		talking.startThread();
-		
-		Map<String, String> result = null;
-		
-		try {
-			result = _submissions.Run( GeneralStuff._getArguments(requestProperties) );
-		} catch (IOException ex) {
-			talking.notifyError();
-		} finally{
-			talking.stopThread();
-		}
-                
-		String text = result.get("text");
-		requestProperties.put("text", Arrays.asList(new String[]{text}));
-		System.out.println(text);
-		try {
-			GeneralStuff._sendMessage( GeneralStuff._forgeMessage(requestProperties) );
-		} catch (IOException ex) {
-			Logger.getLogger(Commands.class.getName()).log(Level.SEVERE, null, ex);
-		}
-	}
-	
-	public void studentInfo(Map<String, List<String>> requestProperties) throws IOException, InterruptedException{
-		StudentInfo _studentInfo= new StudentInfo();
-		UnitofInteraction talking = new UnitofInteraction(requestProperties);
-		talking.startThread();
-                
-		Map<String, String> result = 
-			_studentInfo.Run( GeneralStuff._getArguments(requestProperties));		
-		
-		talking.stopThread();
-                
-		String text= result.get("text");
-		requestProperties.put("text", Arrays.asList(new String[]{text}));
-		
-		GeneralStuff._sendMessage( GeneralStuff._forgeMessage(requestProperties) );
-	}	
-    
-	public void compare(Map<String, List<String>> requestProperties) {
-		Compare _compare = new Compare();
-		UnitofInteraction talking = new UnitofInteraction(requestProperties);
-		talking.startThread();
-		
-		Map<String, String> result = null;
-		
-		try {
-			result = _compare.Run( GeneralStuff._getArguments(requestProperties) );
-		} catch (IOException ex) {
-			talking.notifyError();
-		} finally{
-			talking.stopThread();
-		}
-                
-		String text = result.get("text");
-		requestProperties.put("text", Arrays.asList(new String[]{text}));
-		System.out.println(text);
-		
-		try {
-			GeneralStuff._sendMessage( GeneralStuff._forgeMessage(requestProperties) );
-		} catch (IOException ex) {
-			Logger.getLogger(Commands.class.getName()).log(Level.SEVERE, null, ex);
-		}
-	}
-        
-	public void recommendations(Map<String, List<String>> requestProperties) throws Exception{
-		Recommendations _recommendations = new Recommendations();
-		UnitofInteraction talking = new UnitofInteraction(requestProperties);
-		talking.startThread();
-		
-		Map<String, String> result = null;
-                
-		try {
-			result = _recommendations.Run( GeneralStuff._getArguments(requestProperties) );
-		} catch (IOException ex) {
-			talking.notifyError();
-			talking.stopThread();
-		}
-                
-		talking.stopThread();
-		
-		String text = result.get("text");
-		requestProperties.put("text", Arrays.asList(new String[]{text}));
-		
-		try {
-			GeneralStuff._sendMessage( GeneralStuff._forgeMessage(requestProperties) );
-		} catch (IOException ex) {
-			Logger.getLogger(Commands.class.getName()).log(Level.SEVERE, null, ex);
-		}
-	}
+        talking.startThread();
 
-	private class UnitofInteraction{
-		Thread thread;
-		UserInteraction instance;
+        Map<String, String> result = _help.Run(requestProperties);
 
-		public UnitofInteraction(Map<String, List<String>> requestProperties){
-			this.instance = new UserInteraction();
-			this.instance.prepareInfo(requestProperties);
-			this.thread = new Thread(this.instance);
-		}
+        talking.stopThread();
 
-		public void startThread(){
-			this.thread.start();
-		}
+        String text = result.get("text");
+        requestProperties.put("text", Arrays.asList(new String[]{text}));
+        System.out.println(text);
+        try {
+            GeneralStuff._sendMessage(GeneralStuff._forgeMessage(requestProperties));
+        } catch (IOException ex) {
+            Logger.getLogger(Commands.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
 
-		public void notifyError(){
-			this.instance.notifyError();
-			this.instance.killThread();
-		}
+    public void echo(Map<String, List<String>> requestProperties) {
+        Echo _echo = new Echo();
+        UnitofInteraction talking = new UnitofInteraction(requestProperties);
+        talking.startThread();
 
-		public void stopThread(){
-			this.instance.killThread();
-			this.thread.interrupt();
-			try{
-			  this.thread.join();  
-			}catch(Exception e){
+        Map<String, String> result = _echo.Run(requestProperties);
 
-			}
-		}
+        talking.stopThread();
 
-	}
+        String text = result.get("text");
+        requestProperties.put("text", Arrays.asList(new String[]{text}));
+
+        try {
+            GeneralStuff._sendMessage(GeneralStuff._forgeMessage(requestProperties));
+        } catch (IOException ex) {
+            Logger.getLogger(Commands.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public void submissions(Map<String, List<String>> requestProperties) {
+        Submissions _submissions = new Submissions();
+        UnitofInteraction talking = new UnitofInteraction(requestProperties);
+        talking.startThread();
+
+        Map<String, String> result = null;
+
+        try {
+            result = _submissions.Run(GeneralStuff._getArguments(requestProperties));
+        } catch (IOException ex) {
+            talking.notifyError();
+        } finally {
+            talking.stopThread();
+        }
+
+        String text = result.get("text");
+        requestProperties.put("text", Arrays.asList(new String[]{text}));
+        System.out.println(text);
+        try {
+            GeneralStuff._sendMessage(GeneralStuff._forgeMessage(requestProperties));
+        } catch (IOException ex) {
+            Logger.getLogger(Commands.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public void studentInfo(Map<String, List<String>> requestProperties) {
+        StudentInfo _studentInfo = new StudentInfo();
+        UnitofInteraction talking = new UnitofInteraction(requestProperties);
+        talking.startThread();
+
+        Map<String, String> result = null;
+
+        result = _studentInfo.Run(GeneralStuff._getArguments(requestProperties));
+
+        talking.stopThread();
+
+        String text = result.get("text");
+        requestProperties.put("text", Arrays.asList(new String[]{text}));
+        System.out.println(text);
+        try {
+            GeneralStuff._sendMessage(GeneralStuff._forgeMessage(requestProperties));
+        } catch (IOException ex) {
+            Logger.getLogger(Commands.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }
+
+    public void group(Map<String, List<String>> requestProperties) {
+        UnitofInteraction talking = new UnitofInteraction(requestProperties);
+        talking.startThread();
+        Group _group = new Group();
+
+        Map<String, String> result
+                = _group.Run(GeneralStuff._getArguments(requestProperties));
+
+        talking.stopThread();
+
+        if (result == null) {
+            return;
+        }
+
+        String text = result.get("text");
+        //System.out.println("\n\n Texto recibido \n"  + text);
+        requestProperties.put("text", Arrays.asList(new String[]{text}));
+
+    }
+
+    public void compare(Map<String, List<String>> requestProperties) {
+        Compare _compare = new Compare();
+        UnitofInteraction talking = new UnitofInteraction(requestProperties);
+        talking.startThread();
+
+        Map<String, String> result = null;
+
+        try {
+            result = _compare.Run(GeneralStuff._getArguments(requestProperties));
+        } catch (IOException ex) {
+            talking.notifyError();
+        } finally {
+            talking.stopThread();
+        }
+
+        String text = result.get("text");
+        requestProperties.put("text", Arrays.asList(new String[]{text}));
+        System.out.println(text);
+
+        try {
+            GeneralStuff._sendMessage(GeneralStuff._forgeMessage(requestProperties));
+        } catch (IOException ex) {
+            Logger.getLogger(Commands.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public void recommendations(Map<String, List<String>> requestProperties) throws Exception {
+        Recommendations _recommendations = new Recommendations();
+        UnitofInteraction talking = new UnitofInteraction(requestProperties);
+        talking.startThread();
+
+        Map<String, String> result = null;
+
+        try {
+            result = _recommendations.Run(GeneralStuff._getArguments(requestProperties));
+        } catch (IOException ex) {
+            talking.notifyError();
+            talking.stopThread();
+        }
+
+        talking.stopThread();
+
+        String text = result.get("text");
+        requestProperties.put("text", Arrays.asList(new String[]{text}));
+
+        try {
+            GeneralStuff._sendMessage(GeneralStuff._forgeMessage(requestProperties));
+        } catch (IOException ex) {
+            Logger.getLogger(Commands.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    private class UnitofInteraction {
+
+        Thread thread;
+        UserInteraction instance;
+
+        public UnitofInteraction(Map<String, List<String>> requestProperties) {
+            this.instance = new UserInteraction();
+            this.instance.prepareInfo(requestProperties);
+            this.thread = new Thread(this.instance);
+        }
+
+        public void startThread() {
+            this.thread.start();
+        }
+
+        public void notifyError() {
+            this.instance.notifyError();
+            this.instance.killThread();
+        }
+
+        public void stopThread() {
+            this.instance.killThread();
+            this.thread.interrupt();
+            try {
+                this.thread.join();
+            } catch (Exception e) {
+
+            }
+        }
+
+    }
 }
