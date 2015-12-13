@@ -107,11 +107,11 @@ public class Commands {
 		requestProperties.put("text", Arrays.asList(new String[]{text}));
 		System.out.println(text);
 		
-		try {
-			GeneralStuff._sendMessage( GeneralStuff._forgeMessage(requestProperties) );
-		} catch (IOException ex) {
-			Logger.getLogger(Commands.class.getName()).log(Level.SEVERE, null, ex);
-		}
+//		try {
+//			GeneralStuff._sendMessage( GeneralStuff._forgeMessage(requestProperties) );
+//		} catch (IOException ex) {
+//			Logger.getLogger(Commands.class.getName()).log(Level.SEVERE, null, ex);
+//		}
 	}
         
 	public void recommendations(Map<String, List<String>> requestProperties) throws Exception{
