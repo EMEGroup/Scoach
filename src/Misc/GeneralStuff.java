@@ -62,7 +62,7 @@ public class GeneralStuff {
 			public void execute(Map<String, List<String>> req){ C.compare(req); }
 		});
                 
-		COMMANDS.put("help", new Command(){
+		COMMANDS.put("recommend", new Command(){
 			@Override
 			public void execute(Map<String, List<String>> req){
 				try {

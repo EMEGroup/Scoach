@@ -125,10 +125,9 @@ public class Commands {
 			result = _recommendations.Run( GeneralStuff._getArguments(requestProperties) );
 		} catch (IOException ex) {
 			talking.notifyError();
+		} finally{
 			talking.stopThread();
 		}
-                
-		talking.stopThread();
 		
 		String text = result.get("text");
 		requestProperties.put("text", Arrays.asList(new String[]{text}));
