@@ -31,21 +31,22 @@ public class StudentInfo extends GeneralBehavior {
     @Override
     public Map<String, String> Run(Map<String, List<String>> requestProperties) {
         Map<String, String> responseProperties;
-        responseProperties = new HashMap<>();
+        responseProperties = new HashMap<String, String>();
         responseProperties.put("text", HELPTEXT);
 
-        Map<String, List<String>> result = new HashMap<>();
+        Map<String, List<String>> result = new HashMap<String, List<String>>();
 
         BD basedato = new BD();
         basedato.startConection();
 
-        List<String> students = new ArrayList<>();
+        List<String> students = new ArrayList<String>();
 //----------------------------------------------------------------------------
         if (requestProperties.get("--nick") != null) {
             for (String s : requestProperties.get("--nick")) {
                 students.add(s);
             }
-            Map<String, List<String>> StudentData = new HashMap<>();
+            Map<String, List<String>> StudentData = 
+				new HashMap<String, List<String>>();
             for (String s : students) {
                 for (ArrayList<String> datosBD : basedato.getStudent(s, "nick")) {
                     StudentData.put(s, datosBD);
@@ -64,7 +65,8 @@ public class StudentInfo extends GeneralBehavior {
                 students.add(s);
             }
 
-            Map<String, List<String>> StudentData = new HashMap<>();
+            Map<String, List<String>> StudentData = 
+				new HashMap<String, List<String>>();
 
             for (String s : students) {
                 for (ArrayList<String> datosBD : basedato.getStudent(s, "name")) {
@@ -81,7 +83,8 @@ public class StudentInfo extends GeneralBehavior {
             for (String s : requestProperties.get("--user")) {
                 students.add(s);
             }
-            Map<String, List<String>> StudentData = new HashMap<>();
+            Map<String, List<String>> StudentData = 
+				new HashMap<String, List<String>>();
 
             for (String s : students) {
                 for (ArrayList<String> datosBD : basedato.getStudent(s, "user")) {
@@ -97,13 +100,14 @@ public class StudentInfo extends GeneralBehavior {
 
         //------------------------------------------------------------------------------------------
         if (requestProperties.get("--group") != null ) {
-            ArrayList<String> Groups = new ArrayList<>();
+            ArrayList<String> Groups = new ArrayList<String>();
             String report = "";
 
             for (String s : requestProperties.get("--group")) {
                 Groups.add(s);
             }
-            Map<String, List<String>> StudentData = new HashMap<>();
+            Map<String, List<String>> StudentData = 
+				new HashMap<String, List<String>>();
             //ArrayList<String> miembros = new ArrayList<>();
 
             for (String gName : Groups) {

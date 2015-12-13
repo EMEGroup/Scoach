@@ -40,7 +40,8 @@ public class BD {
 
     public ArrayList<ArrayList<String>> getStudent(String est, String specify) {
 
-        ArrayList<ArrayList<String>> resultSet = new ArrayList<>();
+        ArrayList<ArrayList<String>> resultSet = 
+			new ArrayList<ArrayList<String>>();
 
         String sql = "";
         if (specify.toLowerCase().compareTo("nick") == 0) {
@@ -75,7 +76,7 @@ public class BD {
             ResultSet rs = stmt.executeQuery(sql);
 
             while (rs.next()) {
-                ArrayList<String> Info = new ArrayList<>();
+                ArrayList<String> Info = new ArrayList<String>();
                 Info.add(rs.getString("user"));
                 Info.add(rs.getString("Nombre"));
                 Info.add(rs.getString("Apellido"));
@@ -99,7 +100,7 @@ public class BD {
     }
     public ArrayList<String> getStudentByAlias(String est)
     {
-        ArrayList<String> Info = new ArrayList<>();
+        ArrayList<String> Info = new ArrayList<String>();
 
         String sql = "";
     
