@@ -12,7 +12,7 @@ import java.util.Map;
 import Misc.*;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Arrays;
 import java.util.Set;
 
 /**
@@ -43,25 +43,10 @@ public class StudentInfo extends GeneralBehavior {
 
         try {
             
-//            String bug = "";
-//
-//        Iterator it = requestProperties.entrySet().iterator();
-//        while (it.hasNext()) {
-//
-//            Map.Entry pair = (Map.Entry) it.next();
-//
-//            it.remove(); // avoids a ConcurrentModificationException
-//
-//            String BKey = (String) pair.getKey();
-//
-//            List<String> Bargs = (List<String>) pair.getValue();
-//
-//            bug += BKey + " - " + Bargs + "\n";
-//        }
-//        System.out.println("Salida:\n" + bug);
-
             //----------------------------------------------------------------------------
             if (requestProperties.get("--nick") != null) {
+                
+                
                 for (String s : requestProperties.get("--nick")) {
                     students.add(s);
                 }
@@ -98,6 +83,7 @@ public class StudentInfo extends GeneralBehavior {
             }
             //------------------------------------------------------------------------------------------
             if (requestProperties.get("--user") != null) {
+                //System.out.println("\n nick \n" );
                 for (String s : requestProperties.get("--user")) {
                     students.add(s);
                 }
@@ -110,13 +96,16 @@ public class StudentInfo extends GeneralBehavior {
 
                 }
                 // Converting to string for Printing
+              
                 responseProperties.put("text", makeReport(StudentData));
+                
                 return responseProperties;
 
             }
 
             //------------------------------------------------------------------------------------------
             if (requestProperties.get("--group") != null) {
+                //System.out.println("\n nick \n" );
                 ArrayList<String> Groups = new ArrayList<>();
                 String report = "";
 
@@ -137,7 +126,7 @@ public class StudentInfo extends GeneralBehavior {
 
                     }
                     report += makeReport(StudentData);
-                    report += "\n";
+                    //report += "\n";
 
                 }
                 // Converting to string for Printing
@@ -147,7 +136,7 @@ public class StudentInfo extends GeneralBehavior {
 
             //----------------------------------------------------------------------------
             if (requestProperties.get("--add") != null) {
-            System.out.println("\n\n add\n\n");
+            //System.out.println("\n\n add\n\n");
                 ArrayList<String> newStudent = new ArrayList<>();
 
                 for (String s : requestProperties.get("--add")) {
@@ -195,17 +184,85 @@ public class StudentInfo extends GeneralBehavior {
 
     }
 
-    public String makeReport(Map<String, List<String>> StudentData) {
-        String respuesta = "```   username   | Name  | Last Name | Birthday | Sign up Date |   type   | Coach's Name | Coach's lastN\n";
+    public String makeReport(Map<String, List<String>> StudentData) 
+    {
+        
+        String respuesta = "```";
+        String [] headers ={"Username","Name" , "Last Name" , "Birthday" , "Sign up Date" , "Type" , "Coach's Name" , "Coach's lastN"};
+        //Object [] firstVals = StudentData.keyet().toArray();
+        //System.out.println("\n ye 1 \n" );
+        ArrayList<List<String>> table = new ArrayList<>(StudentData.values());
+
+        //List<String>[] table = StudentData.values().toArray(new List<String>[]);
+       
+        int [] values = getSpaces(headers, table );
+        
         Set<Map.Entry<String, List<String>>> entrySet = StudentData.entrySet();
-        for (Map.Entry<String, List<String>> x : entrySet) {
-            //respuesta += x.getKey();
-            for (String s : x.getValue()) {
-                respuesta += "  | " + s;
+        
+        for(int i = 0 ; i< headers.length ; i++)
+        {
+            respuesta += headers[i];
+            
+            for(int j = headers[i].length() ; j <= values[i] ; j++ )
+            {
+                respuesta += " ";
             }
-            respuesta += "\n```";
+            if(i != headers.length-1)
+            respuesta += " | ";
         }
+        int total_length= respuesta.length();
+        respuesta += "\n";
+        for(int i = 0; i <= total_length ; i++)
+        {
+            respuesta += "-";
+        }
+        
+        respuesta += "\n";
+        
+        for(Map.Entry<String, List<String>> x : entrySet) {
+            //respuesta += x.getKey();
+            int i = 0;
+            for (String s : x.getValue()) {
+                
+                respuesta +=  s;
+                for(int j = s.length() ; j <= values[i] ; j++ )
+                {
+                    respuesta += " ";
+                }
+                if(i != headers.length-1)
+                     respuesta += " | ";
+                i++;
+            }
+               respuesta += "\n";
+            
+        }
+        respuesta += "\n```";
+        
+        
+        
         return respuesta;
+    }
+    
+    public int[] getSpaces(String[] headers, ArrayList<List<String>> values)
+    {
+        int[] spaces = new int[headers.length];
+     
+        Arrays.fill(spaces, 0);
+        
+        for(int i = 0 ; i < headers.length ; i++ )
+        {
+            
+            if(headers[i].length() > spaces[i] )
+                spaces[i] = headers[i].length(); 
+            for (List<String> value : values) 
+            {
+                if(value.get(i).length() >  spaces[i] )
+                {
+                    spaces[i] = value.get(i).length();  
+                }
+            }
+        }
+        return spaces;
     }
 
 }
