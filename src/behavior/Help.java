@@ -16,16 +16,16 @@ public class Help extends GeneralBehavior{
 		+ "For more info about a specific command, run help <command>."
 		+ "```";
 	
-	private static final Map<String, String> commandsHelp;
+	private static final Map<String, String> COMMANDSHELP;
 	
 	static{
-		commandsHelp = new HashMap<String, String>();
+		COMMANDSHELP = new HashMap<String, String>();
 		
-		commandsHelp.put("echo", Echo.HELPTEXT);
-		commandsHelp.put("help", Help.HELPTEXT);
-		commandsHelp.put("submissions", Submissions.HELPTEXT);
-		commandsHelp.put("student", StudentInfo.HELPTEXT);
-		commandsHelp.put("compare", Compare.HELPTEXT);
+		COMMANDSHELP.put("echo", Echo.HELPTEXT);
+		COMMANDSHELP.put("help", Help.HELPTEXT);
+		COMMANDSHELP.put("submissions", Submissions.HELPTEXT);
+		COMMANDSHELP.put("student", StudentInfo.HELPTEXT);
+		COMMANDSHELP.put("compare", Compare.HELPTEXT);
 	}
 	
 	@Override
@@ -41,8 +41,8 @@ public class Help extends GeneralBehavior{
 			command = requestProperties.get("text").get(0);
 			command = command.split(" ")[0];
 			
-			if(commandsHelp.containsKey(command)){
-				responseProperties.put("text", commandsHelp.get(command));
+			if(COMMANDSHELP.containsKey(command)){
+				responseProperties.put("text", COMMANDSHELP.get(command));
 				return responseProperties;
 			}
 		}
