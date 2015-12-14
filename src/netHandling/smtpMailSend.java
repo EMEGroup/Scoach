@@ -22,22 +22,22 @@ public class smtpMailSend
 		fromEmailAddress = from;
 		subjectTxt = subject;
 		msgTxt = message;
-		
-		// smtpMailSender.postMail( toEmailList, emailSubjectTxt, emailMsgTxt, emailFromAddress);
-		// System.out.println("Sucessfully Sent mail to All Users");
 	}
 
 	public void postMail() throws MessagingException, AuthenticationFailedException
 	{
 		//Set the host smtp address
 		Properties props = new Properties();
-		props.put("mail.smtp.host", SMTP_HOST_NAME);
-		props.put("mail.smtp.socketFactory.port", "465");
-		props.put("mail.smtp.sokectFactory.class", "javax.net.ssl.SSLSocketFactory");
-		props.put("mail.smtp.auth", "true");
-		props.put("mail.smtp.port", "465");
+		props.put("mail.smtps.host", SMTP_HOST_NAME);
+		props.put("mail.smtps.starttls.enable", "true");
+		props.put("mail.smtps.ssl.enable", "true");
+		props.put("mail.smtps.socketFactory.port", "465");
+		props.put("mail.smtps.sokectFactory.class", "javax.net.ssl.SSLSocketFactory");
+		props.put("mail.smtps.auth", "true");
+		props.put("mail.smtps.port", "465");
 		Authenticator auth = new SMTPAuthenticator();
 		Session session = Session.getDefaultInstance(props, auth);
+		Transport transport = session.getTransport("smtps");
 		
 		session.setDebug(true);
 
@@ -56,7 +56,11 @@ public class smtpMailSend
 		// Setting the Subject and Content Type
 		msg.setSubject(subjectTxt);
 		msg.setText(msgTxt);
-		Transport.send(msg);
+		msg.saveChanges();
+		
+		transport.connect();
+		transport.sendMessage(msg, msg.getAllRecipients());
+		transport.close();
 	}
 
 	private class SMTPAuthenticator extends javax.mail.Authenticator{

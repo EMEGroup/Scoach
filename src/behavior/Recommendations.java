@@ -30,16 +30,17 @@ public class Recommendations extends GeneralBehavior{
         
 		Map<String, String> responseProperties = new HashMap<String, String>();
 		
-		System.out.println("PREPARING MSG.");
-		
-		smtpMailSend mailSend = new smtpMailSend(
-			new String[]{"ScoachBot@openmailbox.org"}, "ScoachBot@openmailbox.org", "Testing, you know", "WAZZZZUPPP!?");
-		
-		System.out.println("SENDING.");
-		
-		mailSend.postMail();
-		
-		System.out.println("SENDED.");
+		/*
+		TODO:
+		Conseguir nombres de estudiantes dado un grupo.
+		Conseguir todos los problemas de codeforces.
+		Ignorar todos los problemas resueltos entre el conjunto del grupo.
+		Determinar el peor de los miembros del equipo.
+		Filtar los problemas que quedan por los tags dados.
+		Ordenar por dificultad. (Cantidad de gente que lo ha resuelto)
+		Escoger alguno(s) ...
+		Enviar mensajes a los integrantes del grupo (permitir al usuario no hacerlo)
+		*/ 
 		
 		return responseProperties;
     }
