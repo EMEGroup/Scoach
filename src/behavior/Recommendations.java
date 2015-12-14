@@ -1,8 +1,14 @@
 package behavior;
 
+import Misc.GeneralStuff;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.mail.MessagingException;
+import netHandling.smtpMailSend;
 
 public class Recommendations extends GeneralBehavior{
 	
@@ -20,9 +26,20 @@ public class Recommendations extends GeneralBehavior{
 		+ "```";
 	
     @Override
-    public Map<String, String> Run(Map<String, List<String>> requestProperties) throws Exception {
+    public Map<String, String> Run(Map<String, List<String>> requestProperties) throws MessagingException{
         
 		Map<String, String> responseProperties = new HashMap<String, String>();
+		
+		System.out.println("PREPARING MSG.");
+		
+		smtpMailSend mailSend = new smtpMailSend(
+			new String[]{"ScoachBot@openmailbox.org"}, "ScoachBot@openmailbox.org", "Testing, you know", "WAZZZZUPPP!?");
+		
+		System.out.println("SENDING.");
+		
+		mailSend.postMail();
+		
+		System.out.println("SENDED.");
 		
 		return responseProperties;
     }

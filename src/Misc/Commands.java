@@ -121,11 +121,9 @@ public class Commands {
 		
 		Map<String, String> result = null;
                 
-		try {
+		try{
 			result = _recommendations.Run( GeneralStuff._getArguments(requestProperties) );
-		} catch (IOException ex) {
-			talking.notifyError();
-		} finally{
+		} finally {
 			talking.stopThread();
 		}
 		
