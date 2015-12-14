@@ -259,7 +259,7 @@ public class GeneralStuff {
 	}
         
 	public static Map<String, List<String>> _copyMap(Map<String, List<String>> requestProperties){
-        Map<String, List<String>> tmpMap = new HashMap<>();
+        Map<String, List<String>> tmpMap = new HashMap<String, List<String>>();
         
         Set<Map.Entry<String, List<String>>> entrySet = requestProperties.entrySet();
 		Iterator<Map.Entry<String, List<String>>> iterator = entrySet.iterator();

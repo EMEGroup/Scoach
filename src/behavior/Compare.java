@@ -84,18 +84,12 @@ public class Compare extends GeneralBehavior {
 			startingTime = System.currentTimeMillis() / 1000 - startingTime;
 		}
 		
-		String text = "```Comparing ";	// Monospaced block of code or text
-		
-		for(int i = 0; i < handles.size(); i++){
-			text += handles.get(i);
-			if( i < handles.size()-1 )
-				 text += ", ";
-		}
+		String text = "```Comparing";	// Monospaced block of code or text
 		
 		if( time != null){
 			text += " for every submission since " + time + " ago:\n";
 		} else{
-			text += " for all of their submissions:\n";
+			text += " for all submissions:\n";
 		}
 		
 		text += "Username ";

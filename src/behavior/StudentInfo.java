@@ -34,7 +34,7 @@ public class StudentInfo extends GeneralBehavior {
     @Override
     public Map<String, String> Run(Map<String, List<String>> requestProperties) {
         Map<String, String> responseProperties;
-        responseProperties = new HashMap<>();
+        responseProperties = new HashMap<String, String>();
         responseProperties.put("text", HELPTEXT);
 
         BD basedato = new BD();
@@ -49,6 +49,7 @@ public class StudentInfo extends GeneralBehavior {
                 
                 for (String s : requestProperties.get("--nick")) {
                     students.add(s);
+
                 }
                 Map<String, List<String>> StudentData = new HashMap<>();
                 for (String s : students) {
@@ -75,7 +76,6 @@ public class StudentInfo extends GeneralBehavior {
                     for (ArrayList<String> datosBD : basedato.getStudent(s, "name")) {
                         StudentData.put(s, datosBD);
                     }
-
                 }
                 responseProperties.put("text", makeReport(StudentData));
                 return responseProperties;
@@ -123,7 +123,6 @@ public class StudentInfo extends GeneralBehavior {
                         for (ArrayList<String> als : datosBD) {
                             StudentData.put(SingleStudent, als);
                         }
-
                     }
                     report += makeReport(StudentData);
                     //report += "\n";

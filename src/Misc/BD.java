@@ -24,7 +24,8 @@ public class BD {
                 "admin7wbaict", "Exf6tmuYJXWh");
         con.setAutoCommit(false);
 
-        ArrayList<ArrayList<String>> resultSet = new ArrayList<>();
+        ArrayList<ArrayList<String>> resultSet = 
+			new ArrayList<ArrayList<String>>();
 
         String sql = "";
         if (specify.toLowerCase().compareTo("nick") == 0) {
