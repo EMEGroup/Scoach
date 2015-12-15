@@ -201,7 +201,20 @@ public class Recommendations extends GeneralBehavior{
 			}
 			
 			// Remove the solved ones from the potential recommendations
-			problemsList.removeAll(probs);
+			for( int i = 0; i < problemsList.size(); i++ ){
+				
+				for( int j = 0; j < probs.size(); j++){
+					Problem a = problemsList.get(i).getProblem();
+					Problem b = probs.get(j);
+					
+					if( a.getContestId() == b.getContestId() && a.getIndex().equals(b.getIndex()) ){
+						problemsList.remove(i);		i--;
+						probs.remove(j);		j--;
+					}
+					
+				}
+				
+			}
 			
 		}
 		
