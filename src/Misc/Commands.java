@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.mail.MessagingException;
 
 public class Commands {
 
@@ -155,61 +156,73 @@ public class Commands {
         }
     }
 
-    public void recommendations(Map<String, List<String>> requestProperties) throws Exception {
-        Recommendations _recommendations = new Recommendations();
-        UnitofInteraction talking = new UnitofInteraction(requestProperties);
-        talking.startThread();
+	public void recommendations(Map<String, List<String>> requestProperties){
+		Recommendations _recommendations = new Recommendations();
+		UnitofInteraction talking = new UnitofInteraction(requestProperties);
+		talking.startThread();
+		
+		// Add the "--groupname" preffix to the given command text so the
+		// _getArguments method puts the groupname under the "--groupname" key.
+		
+		if( requestProperties.get("text") != null ){
+			if( requestProperties.get("text").get(0) != null ){
+				
+				requestProperties.get("text").set(0,
+					"--groupname " + requestProperties.get("text").get(0) );
+			}
+		}
+		
+		Map<String, String> result = null;
+                
+		try {
+			result = _recommendations.Run( GeneralStuff._getArguments(requestProperties) );
+		} catch (MessagingException ex) {
+			result.put("text", result.get("text") + "`" + ex.getMessage() + "`");
+			talking.notifyError();
+		} catch (Exception ex) {
+			talking.notifyError();
+		} finally {
+			talking.stopThread();
+		}
+		
+		String text = result.get("text");
+		requestProperties.put("text", Arrays.asList(new String[]{text}));
+		System.out.println(text);
+		try {
+			GeneralStuff._sendMessage( GeneralStuff._forgeMessage(requestProperties) );
+		} catch (IOException ex) {
+			Logger.getLogger(Commands.class.getName()).log(Level.SEVERE, null, ex);
+		}
+	}
 
-        Map<String, String> result = null;
+	private class UnitofInteraction{
+		Thread thread;
+		UserInteraction instance;
 
-        try {
-            result = _recommendations.Run(GeneralStuff._getArguments(requestProperties));
-        } catch (IOException ex) {
-            talking.notifyError();
-            talking.stopThread();
-        }
+		public UnitofInteraction(Map<String, List<String>> requestProperties){
+			this.instance = new UserInteraction();
+			this.instance.prepareInfo(requestProperties);
+			this.thread = new Thread(this.instance);
+		}
 
-        talking.stopThread();
+		public void startThread(){
+			this.thread.start();
+		}
 
-        String text = result.get("text");
-        requestProperties.put("text", Arrays.asList(new String[]{text}));
+		public void notifyError(){
+			this.instance.notifyError();
+			this.instance.killThread();
+		}
 
-        try {
-            GeneralStuff._sendMessage(GeneralStuff._forgeMessage(requestProperties));
-        } catch (IOException ex) {
-            Logger.getLogger(Commands.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
+		public void stopThread(){
+			this.instance.killThread();
+			this.thread.interrupt();
+			try{
+			  this.thread.join();  
+			}catch(Exception e){
 
-    private class UnitofInteraction {
+			}
+		}
 
-        Thread thread;
-        UserInteraction instance;
-
-        public UnitofInteraction(Map<String, List<String>> requestProperties) {
-            this.instance = new UserInteraction();
-            this.instance.prepareInfo(requestProperties);
-            this.thread = new Thread(this.instance);
-        }
-
-        public void startThread() {
-            this.thread.start();
-        }
-
-        public void notifyError() {
-            this.instance.notifyError();
-            this.instance.killThread();
-        }
-
-        public void stopThread() {
-            this.instance.killThread();
-            this.thread.interrupt();
-            try {
-                this.thread.join();
-            } catch (Exception e) {
-
-            }
-        }
-
-    }
+	}
 }

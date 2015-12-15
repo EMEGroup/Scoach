@@ -1,4 +1,4 @@
-package httpHandling;
+package netHandling;
 
 import java.io.IOException;
 import java.io.InputStream;
