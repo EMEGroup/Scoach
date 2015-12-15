@@ -24,43 +24,48 @@ public class smtpMailSend
 		msgTxt = message;
 	}
 
-	public void postMail() throws MessagingException, AuthenticationFailedException
+	public void postMail() throws MessagingException, AuthenticationFailedException, Exception
 	{
-		//Set the host smtp address
-		Properties props = new Properties();
-		props.put("mail.smtps.host", SMTP_HOST_NAME);
-		props.put("mail.smtps.starttls.enable", "true");
-		props.put("mail.smtps.ssl.enable", "true");
-		props.put("mail.smtps.socketFactory.port", "465");
-		props.put("mail.smtps.sokectFactory.class", "javax.net.ssl.SSLSocketFactory");
-		props.put("mail.smtps.auth", "true");
-		props.put("mail.smtps.port", "465");
-		Authenticator auth = new SMTPAuthenticator();
-		Session session = Session.getDefaultInstance(props, auth);
-		Transport transport = session.getTransport("smtps");
-		
-		session.setDebug(true);
+		try{
+			//Set the host smtp address
+			Properties props = new Properties();
+			props.put("mail.smtps.host", SMTP_HOST_NAME);
+			props.put("mail.smtps.starttls.enable", "true");
+			props.put("mail.smtps.ssl.enable", "true");
+			props.put("mail.smtps.socketFactory.port", "465");
+			props.put("mail.smtps.sokectFactory.class", "javax.net.ssl.SSLSocketFactory");
+			props.put("mail.smtps.auth", "true");
+			props.put("mail.smtps.port", "465");
+			Authenticator auth = new SMTPAuthenticator();
+			Session session = Session.getDefaultInstance(props, auth);
+			Transport transport = session.getTransport("smtps");
 
-		// create a message
-		Message msg = new MimeMessage(session);
+			// Set to true to activate SMTP debugging
+			// session.setDebug(true);
 
-		// set the from and to address
-		InternetAddress addressFrom = new InternetAddress(fromEmailAddress);
-		msg.setFrom(addressFrom);
+			// create a message
+			Message msg = new MimeMessage(session);
 
-		InternetAddress[] addressTo = new InternetAddress[toEmailList.length];
-		for (int i = 0; i < toEmailList.length; i++)
-			addressTo[i] = new InternetAddress(toEmailList[i]);
-		msg.setRecipients(Message.RecipientType.TO, addressTo);
+			// set the from and to address
+			InternetAddress addressFrom = new InternetAddress(fromEmailAddress);
+			msg.setFrom(addressFrom);
 
-		// Setting the Subject and Content Type
-		msg.setSubject(subjectTxt);
-		msg.setText(msgTxt);
-		msg.saveChanges();
-		
-		transport.connect();
-		transport.sendMessage(msg, msg.getAllRecipients());
-		transport.close();
+			InternetAddress[] addressTo = new InternetAddress[toEmailList.length];
+			for (int i = 0; i < toEmailList.length; i++)
+				addressTo[i] = new InternetAddress(toEmailList[i]);
+			msg.setRecipients(Message.RecipientType.TO, addressTo);
+
+			// Setting the Subject and Content Type
+			msg.setSubject(subjectTxt);
+			msg.setText(msgTxt);
+			msg.saveChanges();
+
+			transport.connect();
+			transport.sendMessage(msg, msg.getAllRecipients());
+			transport.close();
+		} catch (Exception ex){
+			throw ex;
+		}
 	}
 
 	private class SMTPAuthenticator extends javax.mail.Authenticator{

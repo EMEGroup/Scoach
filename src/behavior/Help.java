@@ -13,6 +13,7 @@ public class Help extends GeneralBehavior{
 		+ "    submissions                          Show submissions of an user.\n"
 		+ "    help                                 Displays this help text.\n"
 		+ "    compare                              Displays a brief report of the performance of a list of contestants.\n"
+		+ "    recommend                            Recommends problems not solved by a group standing some diffuculty criteria.\n"
 		+ "For more info about a specific command, run help <command>."
 		+ "```";
 	
@@ -26,6 +27,7 @@ public class Help extends GeneralBehavior{
 		COMMANDSHELP.put("submissions", Submissions.HELPTEXT);
 		COMMANDSHELP.put("student", StudentInfo.HELPTEXT);
 		COMMANDSHELP.put("compare", Compare.HELPTEXT);
+		COMMANDSHELP.put("recommend", Recommendations.HELPTEXT);
 	}
 	
 	@Override

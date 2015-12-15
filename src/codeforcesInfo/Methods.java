@@ -2,6 +2,7 @@ package codeforcesInfo;
 
 import Misc.GeneralStuff;
 import java.io.IOException;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -77,9 +78,9 @@ public class Methods {
 		OUT_OF_COMPETITION
 	}
 	
-	private static final String CODEFORCESURL;
-	private static final String METHODSURL;
-	private static final String PROBLEMSURL;
+	public static final String CODEFORCESURL;
+	public static final String METHODSURL;
+	public static final String PROBLEMSURL;
 	
 	static{
 		CODEFORCESURL = "https://codeforces.com/";
@@ -265,7 +266,7 @@ public class Methods {
 		String text = "";
 		if( submissionsInRange.isEmpty() == false ){
 			
-			String columnIDs = "CANT | " + "PROBLEM NAME ";
+			String columnIDs = "QUANT | " + "PROBLEM NAME ";
 			
 			// String formatting stuff ...
 			for(int i = 0; i < 30 - "PROBLEM NAME ".length(); i++)
@@ -296,7 +297,7 @@ public class Methods {
 						"[" + cs.quantity + "]";
 					
 					// String formatting stuff ...
-					for(int x = 0; x < 4 - cs.quantity.toString().length(); x++)
+					for(int x = 0; x < 5 - cs.quantity.toString().length(); x++)
 						textBody += " ";
 					textBody += " ";
 					
@@ -320,9 +321,8 @@ public class Methods {
 					}
 					textBody += "] ";
 
-					textBody += 
-						"[" + PROBLEMSURL + cs.submission.getContestId() +
-						"/" + cs.submission.getProblem().getIndex() + "]";
+					// Add link
+					textBody += "[" + cs.submission.getProblem().forgeLink() + "]";
 
 					textBody += "\n";
 				}
@@ -420,7 +420,7 @@ public class Methods {
 						user_status.class);
 				}
 				
-				if( tmpSubmissions != null && tmpSubmissions.result != null ){
+				if( tmpSubmissions.result != null ){
 					submissionsList.addAll(tmpSubmissions.result);
 				
 				// There's no more submissions 
@@ -466,8 +466,8 @@ public class Methods {
 				fakeSubmissionStoringTime.setCreationTimeSeconds(startingTime);
 				
 				firstIndex = 
-					_lowerBound(submissionsList, fakeSubmissionStoringTime,
-					comparator);
+					GeneralStuff._lowerBound(submissionsList, 
+						fakeSubmissionStoringTime, comparator);
 			}
 			
 			// Get rid of the submissions laying outside of the time range
@@ -507,29 +507,38 @@ public class Methods {
 		return submissionsList;
 	}
 	
-	private static <T> int _lowerBound(List<T> arr, T val, Comparator<T> comparator){
-		return _lowerBound(arr, 0, arr.size(), val, comparator);
-	}
-	
-	private static <T> int _lowerBound(List<T> arr, int firstIndex, int lastIndex, T val, Comparator<T> comparator){
+	public static List<SimpleEntry<Problem, ProblemStatistics> > getProblems(List<String> tags) throws IOException{
 		
-		int distance = lastIndex - firstIndex;
-		int step, mid;
+		List<SimpleEntry<Problem, ProblemStatistics>> returnObject = 
+			new ArrayList<SimpleEntry<Problem, ProblemStatistics>>();
 		
-		while(distance > 0){
-			step = distance / 2;
-			mid = firstIndex + step;
+		String problemsURL = METHODSURL + "problemset.problems" ;
+		
+		if( tags != null && tags.isEmpty() == false ){
+			problemsURL += "?tags=";
 			
-			if( comparator.compare(arr.get(mid), val) < 0 ){
-				firstIndex = mid+1;
-				distance -= step+1;
-			}
-			else{
-				distance = step;
-			}
+			for(String t : tags)
+				problemsURL += t + ";";
 		}
 		
-		return firstIndex;
+		problemset_problems problems = GeneralStuff.getResponseObject(problemsURL, problemset_problems.class);
+		
+		if( problems == null )
+			return null;
+		else if(problems.result == null)
+			return null;
+		else if(problems.result.problems == null)
+			return null;
+		
+		for(int i = 0; i < problems.result.problems.size(); i++){
+			Problem pr = problems.result.problems.get(i);
+			ProblemStatistics ps = problems.result.problemStatistics.get(i);
+			
+			returnObject.add(
+				new SimpleEntry<Problem, ProblemStatistics>(pr, ps) );
+		}
+		
+		return returnObject;
 	}
 	
 }

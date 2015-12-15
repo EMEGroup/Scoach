@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.mail.MessagingException;
 
 public class Commands {
 	public void help(Map<String, List<String>> requestProperties){
@@ -114,22 +115,38 @@ public class Commands {
 		}
 	}
         
-	public void recommendations(Map<String, List<String>> requestProperties) throws Exception{
+	public void recommendations(Map<String, List<String>> requestProperties){
 		Recommendations _recommendations = new Recommendations();
 		UnitofInteraction talking = new UnitofInteraction(requestProperties);
 		talking.startThread();
 		
+		// Add the "--groupname" preffix to the given command text so the
+		// _getArguments method puts the groupname under the "--groupname" key.
+		
+		if( requestProperties.get("text") != null ){
+			if( requestProperties.get("text").get(0) != null ){
+				
+				requestProperties.get("text").set(0,
+					"--groupname " + requestProperties.get("text").get(0) );
+			}
+		}
+		
 		Map<String, String> result = null;
                 
-		try{
+		try {
 			result = _recommendations.Run( GeneralStuff._getArguments(requestProperties) );
+		} catch (MessagingException ex) {
+			result.put("text", result.get("text") + "`" + ex.getMessage() + "`");
+			talking.notifyError();
+		} catch (Exception ex) {
+			talking.notifyError();
 		} finally {
 			talking.stopThread();
 		}
 		
 		String text = result.get("text");
 		requestProperties.put("text", Arrays.asList(new String[]{text}));
-		
+		System.out.println(text);
 		try {
 			GeneralStuff._sendMessage( GeneralStuff._forgeMessage(requestProperties) );
 		} catch (IOException ex) {

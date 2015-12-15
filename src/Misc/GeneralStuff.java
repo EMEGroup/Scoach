@@ -6,6 +6,7 @@ import com.google.gson.stream.JsonReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -17,6 +18,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class GeneralStuff {
+	
+	public final static String EMAILSENDERNAME = "ScoachBot@openmailbox.org";
 	
 	public final static String APITOKEN = "xoxp-10522107940-10536035312-12886577955-3187f9ba9a"; // Change it !!
 	public final static String WEBHOOKURL = "https://hooks.slack.com/services/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";
@@ -64,13 +67,8 @@ public class GeneralStuff {
                 
 		COMMANDS.put("recommend", new Command(){
 			@Override
-			public void execute(Map<String, List<String>> req){
-				try {
-					C.recommendations(req);
-				} catch (Exception ex) {
-					Logger.getLogger(GeneralStuff.class.getName()).log(Level.SEVERE, null, ex);
-				}
-		}});
+			public void execute(Map<String, List<String>> req){ C.recommendations(req); }
+		});
 	}
 	
 	private static GeneralStuff self = null;
@@ -83,7 +81,7 @@ public class GeneralStuff {
 	}
 	
 	public static String getChannelInfo(String channelId, boolean privateGroup) throws IOException{
-		String addr = "";
+		String addr;
 			
 		if(privateGroup)
 			addr = SLACKAPIURL+"/groups.info?token="+APITOKEN+"&channel="+channelId;
@@ -140,7 +138,7 @@ public class GeneralStuff {
 		return responseObject;
 	} 
         
-        	public static void _sendMessage(Map<String,String> messageProperties){
+	public static void _sendMessage(Map<String,String> messageProperties){
 		if(messageProperties == null)	return;
 		
 		String message = "payload={";
@@ -273,6 +271,42 @@ public class GeneralStuff {
         
         return tmpMap;
     }
+	
+	public static <T extends Comparable<T>> int _lowerBound(List<T> arr, T val){
+		Comparator<T> cmprtr = new Comparator<T>() {
+			@Override
+			public int compare(T t, T t1) {
+				return t.compareTo(t1);
+			}
+		};
+		
+		return _lowerBound(arr, 0, arr.size(), val, cmprtr);
+	}
+	
+	public static <T> int _lowerBound(List<T> arr, T val, Comparator<T> comparator){
+		return _lowerBound(arr, 0, arr.size(), val, comparator);
+	}
+	
+	public static <T> int _lowerBound(List<T> arr, int firstIndex, int lastIndex, T val, Comparator<T> comparator){
+		
+		int distance = lastIndex - firstIndex;
+		int step, mid;
+		
+		while(distance > 0){
+			step = distance / 2;
+			mid = firstIndex + step;
+			
+			if( comparator.compare(arr.get(mid), val) < 0 ){
+				firstIndex = mid+1;
+				distance -= step+1;
+			}
+			else{
+				distance = step;
+			}
+		}
+		
+		return firstIndex;
+	}
 	
 	class ChannelInfo{
 		public String status = "";

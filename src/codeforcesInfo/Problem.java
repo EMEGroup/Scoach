@@ -5,7 +5,7 @@ import java.util.List;
 
 public class Problem{
 	
-	private int contestID;
+	private int contestId;
 	private String index;
 	private String name;
 	private ProblemType type;
@@ -15,7 +15,7 @@ public class Problem{
 	public Problem(int contestID, String index, String name, ProblemType type, float points,
 			List<String> tags) {
 		
-		this.contestID = contestID;
+		this.contestId = contestID;
 		this.index = index;
 		this.name = name;
 		this.type = type;
@@ -23,11 +23,11 @@ public class Problem{
 		this.tags = tags;
 	}
 	
-	public int getContestID() {
-		return contestID;
+	public int getContestId() {
+		return contestId;
 	}
-	public void setContestID(int contestID) {
-		this.contestID = contestID;
+	public void setContestId(int contestId) {
+		this.contestId = contestId;
 	}
 	public String getIndex() {
 		return index;
@@ -59,8 +59,22 @@ public class Problem{
 	public void setTags(List<String> tags) {
 		this.tags = tags;
 	}
-	
 	public String getProblemLink(){
 		return "";
+	}
+	
+	public String forgeLink(){
+		return Methods.PROBLEMSURL + contestId + "/" + index;
+	}
+	
+	@Override
+	public String toString(){
+		
+		// |     Contest ID  |   Index   | Problem Name | Link
+		
+		String str = 
+			"|"+ contestId +"|"+ index +"|"+ name +"| "+ forgeLink() +" |";
+		
+		return str;
 	}
 }
