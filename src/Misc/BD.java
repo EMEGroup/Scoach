@@ -35,7 +35,7 @@ public class BD {
             sql = "select Estudiante.username as user , Estudiante.nombre,Estudiante.apellido, Estudiante.fecha_nacimiento, Estudiante.email as email, Estudiante.fecha_ingreso,  Grado.tipo ,  Coach.Nombre as SNOMBRE, coach.apellido as SAPELLIDO \n"
                     + "from estudiante, grado, coach, Estudiante_Juez \n"
                     + "where  estudiante.id_estudiante  = Estudiante_Juez.id_estudiante AND\n"
-                    + "Estudiante_Juez.nick = '" + est + "' AND  \n"
+                    + "Estudiante_Juez.alias = '" + est + "' AND  \n"
                     + "grado.id_grado = estudiante.grado AND estudiante.coach = coach.id_Coach ;";
         } else if (specify.toLowerCase().compareTo("name") == 0) {
 

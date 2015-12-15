@@ -172,9 +172,6 @@ public class Recommendations extends GeneralBehavior{
 		if( members.isEmpty() )
 			return forgeErrorMessage(NOCONTESTANTSMSG);
 		
-		// DEBUG:
-		System.out.println("Submissions before filter = " + problemsList.size());
-		
 		// Wipe out the problems already solved by the contestants
 		for(String handle : members){
 			
@@ -194,9 +191,6 @@ public class Recommendations extends GeneralBehavior{
 			for(Submission sub : subs){
 				if( probs.contains(sub.getProblem()) == false ){
 					probs.add(sub.getProblem());
-					
-					// DEBUG:
-					System.out.println("Removed " + sub.getProblem().toString());
 				}
 			}
 			
@@ -217,9 +211,6 @@ public class Recommendations extends GeneralBehavior{
 			}
 			
 		}
-		
-		// DEBUG:
-		System.out.println("Submissions after filter = " + problemsList.size());
 		
 		// Sort by the amount of users that have solved those problems
 		Collections.sort(problemsList);
@@ -283,14 +274,24 @@ public class Recommendations extends GeneralBehavior{
 		responseProperties.put("text", "```" + text + problemsSummary + "```");
 		// Send an email to the contestants with the suggested problems
 		
-		String[] recipients = new String[]{"ScoachBot@openmailbox.org"};
+		// Get contestants emails to send them homework :)
+		List<String> emails = new ArrayList<String>();
+		
+		for(String username : members){
+			Map<String, String> userInfo = databaseInstance.getStudent(username, "user");
+			
+			emails.add( userInfo.get("email") );
+		}
+		
+		String[] recipients = emails.toArray(new String[]{});
 		String sender = GeneralStuff.EMAILSENDERNAME;
 		String subject = "Here are some new problems for you to try out !";
 		String msgTxt =  "Hi, your coach has asked me to recommend you some "
 			+ "problems, here go my suggestions:\n\n" + problemsSummary
 			+ "\nHave a nice day :^]";
 		
-		smtpMailSend mailSender = new smtpMailSend(recipients, sender, subject, msgTxt);
+		smtpMailSend mailSender = new smtpMailSend(
+			recipients, sender, subject, msgTxt);
 		
 		try {
 			mailSender.postMail();
