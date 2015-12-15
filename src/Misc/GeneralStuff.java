@@ -306,6 +306,14 @@ public class GeneralStuff {
 		return firstIndex;
 	}
 	
+	public static Map<String, String> _forgeErrorMessage(String errorMessage){
+		
+		Map<String, String> returnObject = new HashMap<String, String>();
+		returnObject.put("text", errorMessage);
+		
+		return returnObject;
+	}
+	
 	class ChannelInfo{
 		public String status = "";
 		public String name = "";

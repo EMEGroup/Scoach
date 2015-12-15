@@ -2,6 +2,7 @@ package behavior;
 
 import Misc.BD;
 import Misc.GeneralStuff;
+import static Misc.GeneralStuff._forgeErrorMessage;
 import codeforcesInfo.Methods;
 import codeforcesInfo.Methods.ProblemVerdict;
 import codeforcesInfo.Problem;
@@ -111,7 +112,7 @@ public class Recommendations extends GeneralBehavior{
 		int amount = 3;
 		int popularity = 1;
 		List<String> tags = null;
-		List<String> members = null;
+		List<String> members;
 		
 		BD databaseInstance = new BD();
 		
@@ -159,18 +160,18 @@ public class Recommendations extends GeneralBehavior{
 		
 		// Sanity check
 		if (popularity > 5 || popularity < 1)
-			return forgeErrorMessage(POPULARITYERRORMSG);
+			return _forgeErrorMessage(POPULARITYERRORMSG);
 		else if ( databaseInstance.GroupExists(groupName) == false )
-			return forgeErrorMessage(GROUPNAMEERRORMSG);
+			return _forgeErrorMessage(GROUPNAMEERRORMSG);
 		else if ( amount < 0 )
-			return forgeErrorMessage(AMOUNTINVALIDMSG);
+			return _forgeErrorMessage(AMOUNTINVALIDMSG);
 		else if ( problemsByTag == null || problemsByTag.isEmpty() )
-			return forgeErrorMessage(NOPROBLEMSMSG);
+			return _forgeErrorMessage(NOPROBLEMSMSG);
 		
 		// Get the contestant's nicknames
 		members = databaseInstance.getNicksInGroup(groupName, "codeforces");
 		if( members.isEmpty() )
-			return forgeErrorMessage(NOCONTESTANTSMSG);
+			return _forgeErrorMessage(NOCONTESTANTSMSG);
 		
 		// Wipe out the problems already solved by the contestants
 		for(String handle : members){
@@ -247,7 +248,7 @@ public class Recommendations extends GeneralBehavior{
 		
 		// When all the filtering is done, if no problems to recommend ... :/
 		if( problemsList.isEmpty() )
-			return forgeErrorMessage(TOOSPECIFICMSG);
+			return _forgeErrorMessage(TOOSPECIFICMSG);
 		
 		// Return some info about this problem to the Slack and to the users emails
 		// so the contestants can identify the problem and find it with ease.
@@ -325,14 +326,6 @@ public class Recommendations extends GeneralBehavior{
 		}
 		
 		return 0;	// else return 0, this will take every single problem
-	}
-	
-	private Map<String, String> forgeErrorMessage(String errorMessage){
-		
-		Map<String, String> returnObject = new HashMap<String, String>();
-		returnObject.put("text", errorMessage);
-		
-		return returnObject;
 	}
 	
 }

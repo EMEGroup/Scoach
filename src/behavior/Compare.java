@@ -1,7 +1,11 @@
 package behavior;
 
+import Misc.BD;
+import Misc.GeneralStuff;
+import static Misc.GeneralStuff._forgeErrorMessage;
 import codeforcesInfo.Submission;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,14 +25,23 @@ public class Compare extends GeneralBehavior {
 		+ "NOTE: Months are being treated as 30 days intervals."
 		+ "```";
 	
+	private final static String INVALIDTEAMNAMEMSG = "```"
+		+ "The passed team name is not valid, it means it does not exist in the database."
+		+ "```";
+	private final static String NOCONTESTANTSMSG = "```"
+		+ "The passed team does not contain a single contestant ... please add some "
+		+ "beforehand or call this command with the --nicks argument and pass their nicks instead."
+		+ "```";
+	
 	private final static String[] VERDICTS = 
 		{"AC", "PE", "WA", "TLE", "RTE", "MLE", "CE", "HACKED"};
 	
 	@Override
-	public Map<String, String> Run(Map<String, List<String>> requestProperties) throws IOException {
+	public Map<String, String> Run(Map<String, List<String>> requestProperties) throws IOException, SQLException, ClassNotFoundException {
 		
 		int usernameMaxSize = 25;
 		ArrayList<String> handles = null;
+		String teamname = null;
 		String verdict = null;
 		String time = null;
 		Long startingTime = null;
@@ -38,20 +51,36 @@ public class Compare extends GeneralBehavior {
 		
 		returnObject = new HashMap<String, String>();
 		
+		BD databaseInstance = new BD();
+		
 		// Get handles/nicknames by the name of the team: NOT IMPLEMENTED
 		// This way must check in the database for the members of a team
 		
 		// Get handles/nicknames from the --nick argument
 		if( requestProperties.get("--nicks") != null ){
 			handles = new ArrayList<String>(requestProperties.get("--nicks"));
+		
+		} else if( requestProperties.get("--team") != null ){
+			teamname = requestProperties.get("--team").get(0);
 			
-			// Make sure each handle is unique
-			for(int i = 0; i < handles.size(); i++){
-				for(int j = i+1; j < handles.size(); j++){
-					if( handles.get(i).equals( handles.get(j) ) == true ){
-						handles.remove(j);
-						j--;
-					}
+			// Make sure the team exists in the database
+			if( databaseInstance.GroupExists(teamname) == false){
+				return _forgeErrorMessage(INVALIDTEAMNAMEMSG);
+			}
+			
+			handles = databaseInstance.getNicksInGroup(teamname, "codeforces");	
+		}
+		
+		if( handles == null || handles.isEmpty() ){
+			return _forgeErrorMessage(NOCONTESTANTSMSG);
+		}
+		
+		// Make sure each handle is unique
+		for(int i = 0; i < handles.size(); i++){
+			for(int j = i+1; j < handles.size(); j++){
+				if( handles.get(i).equals( handles.get(j) ) == true ){
+					handles.remove(j);
+					j--;
 				}
 			}
 		}

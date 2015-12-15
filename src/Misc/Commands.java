@@ -142,7 +142,11 @@ public class Commands {
             result = _compare.Run(GeneralStuff._getArguments(requestProperties));
         } catch (IOException ex) {
             talking.notifyError();
-        } finally {
+        } catch (SQLException ex) {
+			talking.notifyError();
+		} catch (ClassNotFoundException ex) {
+			talking.notifyError();
+		} finally {
             talking.stopThread();
         }
 
