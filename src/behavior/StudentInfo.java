@@ -255,7 +255,7 @@ public class StudentInfo extends GeneralBehavior {
             {
                 return "Must specify one username per command!";
             }
-            System.out.println("1\n");
+            
             if(dataBase.studentExists(users.get(0)))
             {
                 List<String> args = requestProperties.get("--judge");
@@ -264,15 +264,15 @@ public class StudentInfo extends GeneralBehavior {
                     String [] OJ_Student = relation.split("=");
                     if(dataBase.nickExists(users.get(0),OJ_Student[0]))
                     {
-                        System.out.println("2\n");
+                    
                         dataBase.updateNickStudent(users.get(0),OJ_Student[0],OJ_Student[1]);
                         
                         answer += "Values altered for student " + users.get(0) + "!\n";
                     }
-                    System.out.println("3\n");
+                    else
                     dataBase.insertNickStudent(users.get(0),OJ_Student[0],OJ_Student[1]);
                 } 
-                return "Nickname added!";
+                return answer + "Nickname added!";
             }
             
         }

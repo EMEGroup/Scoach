@@ -6,8 +6,7 @@
 package behavior;
 
 import Misc.BD;
-import java.io.PrintWriter;
-import java.io.StringWriter;
+
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
