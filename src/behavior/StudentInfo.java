@@ -49,8 +49,8 @@ public class StudentInfo extends GeneralBehavior {
         
         BD basedato = new BD();
 
-        List<String> students = new ArrayList<>();
-        Map<String, Map<String, String>> StudentData = new HashMap<>();
+        List<String> students = new ArrayList<String>();
+        Map<String, Map<String, String>> StudentData = new HashMap<String, Map<String, String>>();
         try {
             for(String op : options)
             {
@@ -87,7 +87,7 @@ public class StudentInfo extends GeneralBehavior {
             //------------------------------------------------------------------------------------------
             if (requestProperties.get("--group") != null) {
                
-                ArrayList<String> Groups = new ArrayList<>();
+                ArrayList<String> Groups = new ArrayList<String>();
                 String report = "";
 
                 for (String s : requestProperties.get("--group")) {
@@ -111,7 +111,7 @@ public class StudentInfo extends GeneralBehavior {
             //----------------------------------------------------------------------------
             if (requestProperties.get("--add") != null) {
                 //System.out.println("\n\n add\n\n");
-                ArrayList<String> newStudent = new ArrayList<>();
+                ArrayList<String> newStudent = new ArrayList<String>();
 
                 for (String s : requestProperties.get("--add")) {
                     newStudent.add(s);
@@ -147,10 +147,13 @@ public class StudentInfo extends GeneralBehavior {
 
             }
 
-        } catch (ClassNotFoundException | SQLException ex) {
+        } catch (SQLException ex) {
             responseProperties.put("text", "Problem searching database.");
             return responseProperties;
-        }
+        } catch (ClassNotFoundException ex){
+			responseProperties.put("text", "Problem searching database.");
+            return responseProperties;
+		}
 
         responseProperties.put("text", HELPTEXT);
 
@@ -223,7 +226,7 @@ public class StudentInfo extends GeneralBehavior {
         String[] keys = {"user", "Name", "LastName", "BirthDay", "email", "SignInD", "Type", "CName", "CLastName"};
         int[] spaces = new int[headers.length];
 
-        ArrayList<Map<String, String>> values = new ArrayList<>(map);
+        ArrayList<Map<String, String>> values = new ArrayList<Map<String, String>>(map);
         Arrays.fill(spaces, 0);
 
         for (int i = 0; i < headers.length; i++) {

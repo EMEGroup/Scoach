@@ -28,7 +28,7 @@ public class BD {
         con.setAutoCommit(false);
 
         Map<String, String> resultSet
-                = new HashMap<>();
+                = new HashMap<String, String>();
 
         String sql = "";
         if (specify.toLowerCase().compareTo("nick") == 0) {
@@ -88,7 +88,7 @@ public class BD {
                 "admin7wbaict", "Exf6tmuYJXWh");
         con.setAutoCommit(false);
 
-        ArrayList<String> Info = new ArrayList<>();
+        ArrayList<String> Info = new ArrayList<String>();
 
         String sql = "";
 
@@ -288,7 +288,7 @@ public class BD {
 
     public ArrayList<String> filterStudents(ArrayList<String> studNotF) throws SQLException, ClassNotFoundException {
 
-        ArrayList<String> studF = new ArrayList<>();
+        ArrayList<String> studF = new ArrayList<String>();
 
         for (String s : studNotF) {
             if (studentExists(s)) {
@@ -300,7 +300,7 @@ public class BD {
     }
 
     public List<String> filterStudentsGroup(String group, List<String> students) throws SQLException, ClassNotFoundException {
-        List<String> tabla = new ArrayList<>();
+        List<String> tabla = new ArrayList<String>();
         Class.forName("org.postgresql.Driver");
 
         Connection con = DriverManager.getConnection("jdbc:postgresql://127.10.65.2:5432/scoach",

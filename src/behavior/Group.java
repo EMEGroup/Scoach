@@ -27,7 +27,7 @@ public class Group extends GeneralBehavior {
     @Override
     public Map<String, String> Run(Map<String, List<String>> requestProperties) throws SQLException, ClassNotFoundException {
         Map<String, String> responseProperties;
-        responseProperties = new HashMap<>();
+        responseProperties = new HashMap<String, String>();
         responseProperties.put("text", HELPTEXT);
         
         String answer = "";
@@ -36,7 +36,7 @@ public class Group extends GeneralBehavior {
         boolean NotFM = false;
 
         //String studAdd = "";
-        ArrayList<String> MyStudents = new ArrayList<>();
+        ArrayList<String> MyStudents = new ArrayList<String>();
 
         BD basedato = new BD();
 
