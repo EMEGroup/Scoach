@@ -10,16 +10,17 @@ public class Submissions extends GeneralBehavior{
 	
 	public static final String HELPTEXT = 
 		"```" +
-		"Submissions                          Show submissions of an user.\n"
-		+ "submissions [OPTIONS] --by <codeforces handle of the user>\n" +
+		"Submissions                          Show submissions of an user.\n" +
+		"USAGE:\n" +
+		"submissions [OPTIONS] --by <codeforces handle of the user>\n" +
 		"OPTIONS:\n" +
 		"\t--tags <tag>[,<tag> ...]\t\tA comma separated list of problem tags. (dp, math, greedy ...)\n" +
 		"\t--oj <online judge>\t\t\tName of the online judges to search submissions for.\n" +
 		"\t--verdict <verdict>\t\t\tVerdict string (AC, WA, TLE ...)\n" +
 		"\t--since <time>('d'|'w'|'m'|'y')\t\tTime of the first submission to show. (days, weeks, months ...)\n" +
-		"\t--show <amount>\t\t\tAmount of submissions to show\n"
-		+ "--all\t\t\t\tShow all submissions, overrides the --show argument."
-		+ "```";
+		"\t--show <amount>\t\t\tAmount of submissions to show\n" +
+		"--all\t\t\t\tShow all submissions, overrides the --show argument." +
+		"```";
 	
 	@Override
 	public Map<String, String> Run(Map<String, List<String>> requestProperties) throws IOException{
