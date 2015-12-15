@@ -1,10 +1,14 @@
 package behavior;
 
+import Misc.BD;
 import Misc.GeneralStuff;
 import codeforcesInfo.Methods;
+import codeforcesInfo.Methods.ProblemVerdict;
 import codeforcesInfo.Problem;
 import codeforcesInfo.ProblemStatistics;
+import codeforcesInfo.Submission;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -12,7 +16,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import javax.mail.AuthenticationFailedException;
 import javax.mail.MessagingException;
 import netHandling.smtpMailSend;
 
@@ -58,6 +61,11 @@ public class Recommendations extends GeneralBehavior{
 		+ "i could have ignored that and still have done my work, but you know  ..."
 		+ "i decided it's better to notify you about this, have a nice day btw. :)"
 		+ "```";
+	private static final String NOCONTESTANTSMSG = "```"
+		+ "Sorry but the passed groupname, even existing, does not contain or reference "
+		+ "any contestant, in other words it is an empty group, please wolve this "
+		+ "out and try again."
+		+ "```";
 	
 	private class ProblemStatsInfo implements Comparable<ProblemStatsInfo>{
 		private Problem problem;
@@ -95,7 +103,7 @@ public class Recommendations extends GeneralBehavior{
 	}
 	
     @Override
-    public Map<String, String> Run(Map<String, List<String>> requestProperties) throws MessagingException, IOException, Exception{
+    public Map<String, String> Run(Map<String, List<String>> requestProperties) throws MessagingException, IOException, SQLException, ClassNotFoundException{
         
 		Map<String, String> responseProperties = new HashMap<String, String>();
 		
@@ -105,17 +113,19 @@ public class Recommendations extends GeneralBehavior{
 		List<String> tags = null;
 		List<String> members = null;
 		
+		BD databaseInstance = new BD();
+		
 		/*
 		TODO:
-		X Conseguir nombres de estudiantes dado un grupo.
+		O Conseguir nombres de estudiantes dado un grupo.
 		O Conseguir todos los problemas de codeforces.
 		O Filtar los problemas que quedan por los tags dados.
-		X Ignorar todos los problemas resueltos entre el conjunto del grupo.
+		O Ignorar todos los problemas resueltos entre el conjunto del grupo.
 		X Determinar el peor de los miembros del equipo.
 		O Ordenar por dificultad. (Cantidad de gente que lo ha resuelto)
 		O Escoger alguno(s) ...
-		Enviar mensajes a los integrantes del grupo (permitir al usuario no hacerlo)
-		Descomentar la salida a Slack
+		O Enviar mensajes a los integrantes del grupo (permitir al usuario no hacerlo)
+		O Descomentar la salida a Slack
 		*/
 		
 		if( requestProperties.get("--groupname") != null ){
@@ -150,12 +160,43 @@ public class Recommendations extends GeneralBehavior{
 		// Sanity check
 		if (popularity > 5 || popularity < 1)
 			return forgeErrorMessage(POPULARITYERRORMSG);
-//		else if ( <check for group's name inside the database> )
-//			return forgeErrorMessage(GROUPNAMEERRORMSG);
+		else if ( databaseInstance.GroupExists(groupName) == false )
+			return forgeErrorMessage(GROUPNAMEERRORMSG);
 		else if ( amount < 0 )
 			return forgeErrorMessage(AMOUNTINVALIDMSG);
 		else if ( problemsByTag == null || problemsByTag.isEmpty() )
 			return forgeErrorMessage(NOPROBLEMSMSG);
+		
+		// Get the contestant's nicknames
+		members = databaseInstance.getNicksInGroup(groupName, "codeforces");
+		if( members.isEmpty() )
+			return forgeErrorMessage(NOCONTESTANTSMSG);
+		
+		// Wipe out the problems already solved by the contestants
+		for(String handle : members){
+			
+			List<Submission> subs = Methods.getSubmissions(handle, null, null, null, null);
+			
+			// Keep only the accepted ones
+			for(int i = 0; i < subs.size(); i++){
+				if( subs.get(i).getVerdict() != ProblemVerdict.OK ){
+					subs.remove(i);
+					i--;
+				}
+			}
+			
+			List<Problem> probs = new ArrayList<Problem>();
+			
+			// Get a list of the problems not repeating them more than once
+			for(Submission sub : subs){
+				if( probs.contains(sub.getProblem()) == false )
+					probs.add(sub.getProblem());
+			}
+			
+			// Remove the solved ones from the potential recommendations
+			problemsList.removeAll(probs);
+			
+		}
 		
 		// Sort by the amount of users that have solved those problems
 		Collections.sort(problemsList);

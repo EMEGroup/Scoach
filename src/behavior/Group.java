@@ -40,10 +40,10 @@ public class Group extends GeneralBehavior {
 
         BD basedato = new BD();
 
-        Iterator it = requestProperties.entrySet().iterator();
+        Iterator<Map.Entry<String, List<String>>> it = requestProperties.entrySet().iterator();
         while(it.hasNext()) {
 
-            Map.Entry pair = (Map.Entry) it.next();
+            Map.Entry<String, List<String>> pair = it.next();
 
                 //it.remove(); // avoids a ConcurrentModificationException
             String group = (String) pair.getKey();

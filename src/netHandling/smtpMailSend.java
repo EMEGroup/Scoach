@@ -41,7 +41,7 @@ public class smtpMailSend
 			Transport transport = session.getTransport("smtps");
 
 			// Set to true to activate SMTP debugging
-			// session.setDebug(true);
+			session.setDebug(true);
 
 			// create a message
 			Message msg = new MimeMessage(session);
