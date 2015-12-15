@@ -74,7 +74,6 @@ public class BD {
         resultSet.put("CName", rs.getString("SNombre"));
         resultSet.put("CLastName", rs.getString("SApellido"));
 
-        System.out.println("\nYEEEEEEEEEEEEEEE\n");
         stmt.close();
 
         con.close();
@@ -223,9 +222,8 @@ public class BD {
         return false;
 
     }
-    //---------------------------------------------------------------------------------------------------------------------
-    //---------------------------------------------------------------------------------------------------------------------
-
+    
+//This is the method
     public ArrayList<String> getNicksInGroup(String group, String OJ) throws SQLException, ClassNotFoundException {
         Class.forName("org.postgresql.Driver");
 
@@ -236,18 +234,18 @@ public class BD {
         ArrayList<String> tabla = new ArrayList<String>();
         ResultSet rs;
 
-        String sql = "select Estudiante.username as user, Estudiante.Nombre , Estudiante.Apellido\n"
-                + "from Estudiante, grupo, grupo_Estudiante\n"
-                + "where \n"
-                + "Estudiante.id_Estudiante = Grupo_Estudiante.ID_Estudiante AND\n"
-                + "Grupo.Nombre = Grupo_Estudiante.Nombre_Grupo AND\n"
-                + "lower(Grupo.Nombre )= lower('" + group + "')\n"
-                + "; ";
+        String sql = " select Estudiante.username as user, Estudiante_Juez.alias as nick \n" +
+                    "from Estudiante, grupo, grupo_Estudiante, Estudiante_juez , Juez \n" +
+                    "where lower(Grupo_Estudiante.Nombre_Grupo)= lower('"+ group +"') AND\n" +
+                    "Estudiante.id_Estudiante = Grupo_Estudiante.ID_Estudiante AND\n" +
+                    "Estudiante.id_Estudiante = Estudiante_Juez.id_estudiante AND \n" +
+                    " Estudiante_juez.id_Juez = Juez.Id_Juez AND \n" +
+                    "lower(Juez.Nombre) = lower('"+ OJ+"')";
 
         Statement stmt = con.createStatement();
         rs = stmt.executeQuery(sql);
         while (rs.next()) {
-            tabla.add(rs.getString("user"));
+            tabla.add(rs.getString("nick"));
         }
 
         stmt.close();
@@ -408,7 +406,7 @@ public class BD {
                 "admin7wbaict", "Exf6tmuYJXWh");
         con.setAutoCommit(false);
 
-        String sql = "insert into grupo values( '" + group.toLowerCase() + "' )";
+        String sql = "insert into grupo values( '" + group.toLowerCase().substring(2, group.length()) + "' )";
         Statement stmt = con.createStatement();
         stmt.executeUpdate(sql);
         con.commit();
@@ -428,7 +426,7 @@ public class BD {
                     "admin7wbaict", "Exf6tmuYJXWh");
             con.setAutoCommit(false);
 
-            sql = "insert into grupo_estudiante values( '" + group.toLowerCase() + "' , " + String.valueOf(getStudentID(s)) + " )";
+            sql = "insert into grupo_estudiante values( '" + group.toLowerCase().substring(2, group.length()) + "' , " + String.valueOf(getStudentID(s)) + " )";
             Statement stmt = con.createStatement();
             stmt.executeUpdate(sql);
             con.commit();

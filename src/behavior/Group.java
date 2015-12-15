@@ -21,7 +21,8 @@ import java.util.Map;
  */
 public class Group extends GeneralBehavior {
 
-    public static final String HELPTEXT = " group             generate groups to refer to multiple students\n";
+    public static final String HELPTEXT = " group             generate groups to refer to multiple students\n"
+                                        + "                   Ex: group --groupname member1, member2...";
 
     @Override
     public Map<String, String> Run(Map<String, List<String>> requestProperties) throws SQLException, ClassNotFoundException {
@@ -40,7 +41,7 @@ public class Group extends GeneralBehavior {
         BD basedato = new BD();
 
         Iterator it = requestProperties.entrySet().iterator();
-        while (it.hasNext()) {
+        while(it.hasNext()) {
 
             Map.Entry pair = (Map.Entry) it.next();
 

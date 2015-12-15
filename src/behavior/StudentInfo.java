@@ -23,7 +23,7 @@ import java.util.Set;
  */
 public class StudentInfo extends GeneralBehavior {
 
-    public static final String HELPTEXT = " student             Get information about a student\n"
+    public static final String HELPTEXT = "``` student             Get information about a student\n"
             + "--nick                           search by contestant's nickname on OJ\n"
             + "--user                           search by contestant's username\n"
             + "                                  use with --judge to give a user a nick in OJ\n"
@@ -33,7 +33,7 @@ public class StudentInfo extends GeneralBehavior {
             + "                                 (args.: username, contestant'sName, contestant'sLastName,\n"
             + "                                         Contestan'sBirthDay (1/dec/2015),  ) \n "
             + "--rm                              remove contestant with his username"
-            + "For more info about a specific command, run help <command>.";
+            + "For more info about a specific command, run help <command>.```";
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////---add NYI
     @Override
