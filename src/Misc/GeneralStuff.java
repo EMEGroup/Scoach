@@ -44,25 +44,23 @@ public class GeneralStuff {
 			public void execute(Map<String, List<String>> req){ C.submissions(req); }
 		});
         
-		COMMANDS.put("student", new Command(){
+		COMMANDS.put("contestants", new Command(){
 			@Override
 			public void execute(Map<String, List<String>> req){ 
-				try {
-					C.studentInfo(req);
-				} catch (IOException ex) {
-					Logger.getLogger(GeneralStuff.class.getName()).log(Level.SEVERE, null, ex);
-				} catch (InterruptedException ex) {
-					Logger.getLogger(GeneralStuff.class.getName()).log(Level.SEVERE, null, ex);
-				}
-}
+                        C.studentInfo(req);
+                        }
+                });
+                COMMANDS.put("group", new Command(){
+			@Override
+			public void execute(Map<String, List<String>> req){ C.group(req); }
 		});
-		
+                
 		COMMANDS.put("compare", new Command(){
 			@Override
 			public void execute(Map<String, List<String>> req){ C.compare(req); }
 		});
                 
-		COMMANDS.put("help", new Command(){
+		COMMANDS.put("recommendations", new Command(){
 			@Override
 			public void execute(Map<String, List<String>> req){
 				try {
