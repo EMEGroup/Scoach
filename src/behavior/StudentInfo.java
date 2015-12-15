@@ -11,8 +11,11 @@ import java.util.List;
 import java.util.Map;
 import Misc.*;
 import java.sql.SQLException;
+import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.Set;
 
 /**
@@ -23,6 +26,8 @@ public class StudentInfo extends GeneralBehavior {
     public static final String HELPTEXT = " student             Get information about a student\n"
             + "--nick                           search by contestant's nickname on OJ\n"
             + "--user                           search by contestant's username\n"
+            + "                                  use with --judge to give a user a nick in OJ\n"
+            + "                                   Ex: contestants --user user --judge OJ=nick"
             + "--name                            search by any name/last name\n"
             + "--add                             add contestant \n"
             + "                                 (args.: username, contestant'sName, contestant'sLastName,\n"
@@ -37,95 +42,65 @@ public class StudentInfo extends GeneralBehavior {
         responseProperties = new HashMap<String, String>();
         responseProperties.put("text", HELPTEXT);
 
+        List<String> options = new ArrayList<String>();
+        options.add("--nick");
+        options.add("--user");
+        options.add("--name");
+        
         BD basedato = new BD();
 
         List<String> students = new ArrayList<>();
-
+        Map<String, Map<String, String>> StudentData = new HashMap<>();
         try {
+            for(String op : options)
+            {
+                if (requestProperties.get(op) != null) 
+                {
+                    if(requestProperties.get("--judge")!= null)
+                    {
+                        responseProperties.put("text", manageJudge(requestProperties));
+                        return responseProperties;
+                    }
+                    List<String> Data = requestProperties.get(op);
+                    if(Data ==null)
+                    {
+                        responseProperties.put("text", "Tag not found!\n");
+                        return responseProperties;
+                        
+                    }
+                    for (String s : Data) {
+                        students.add(s);
+                    }
+
+                    for (String s : students) {
+                        StudentData.put(s, basedato.getStudent(s, op.replace('-', ' ').trim()));
+                    }
+                    // Converting to string for Printing
+                    responseProperties.put("text", makeReport(StudentData));
+                    return responseProperties;
+
+                }
+                
+            }
             
-            //----------------------------------------------------------------------------
-            if (requestProperties.get("--nick") != null) {
-                
-                
-                for (String s : requestProperties.get("--nick")) {
-                    students.add(s);
-
-                }
-                Map<String, List<String>> StudentData = new HashMap<>();
-                for (String s : students) {
-                    for (ArrayList<String> datosBD : basedato.getStudent(s, "nick")) {
-                        StudentData.put(s, datosBD);
-                    }
-
-                }
-                // Converting to string for Printing
-                responseProperties.put("text", makeReport(StudentData));
-                return responseProperties;
-
-            }
-            //------------------------------------------------------------------------------------------
-            if (requestProperties.get("--name") != null) {
-                //Taking out arguments of name, all the names
-                for (String s : requestProperties.get("--name")) {
-                    students.add(s);
-                }
-
-                Map<String, List<String>> StudentData = new HashMap<>();
-
-                for (String s : students) {
-                    for (ArrayList<String> datosBD : basedato.getStudent(s, "name")) {
-                        StudentData.put(s, datosBD);
-                    }
-                }
-                responseProperties.put("text", makeReport(StudentData));
-                return responseProperties;
-
-            }
-            //------------------------------------------------------------------------------------------
-            if (requestProperties.get("--user") != null) {
-                //System.out.println("\n nick \n" );
-                for (String s : requestProperties.get("--user")) {
-                    students.add(s);
-                }
-                Map<String, List<String>> StudentData = new HashMap<>();
-
-                for (String s : students) {
-                    for (ArrayList<String> datosBD : basedato.getStudent(s, "user")) {
-                        StudentData.put(s, datosBD);
-                    }
-
-                }
-                // Converting to string for Printing
-              
-                responseProperties.put("text", makeReport(StudentData));
-                
-                return responseProperties;
-
-            }
 
             //------------------------------------------------------------------------------------------
             if (requestProperties.get("--group") != null) {
-                //System.out.println("\n nick \n" );
+               
                 ArrayList<String> Groups = new ArrayList<>();
                 String report = "";
 
                 for (String s : requestProperties.get("--group")) {
                     Groups.add(s);
                 }
-                Map<String, List<String>> StudentData = new HashMap<>();
-                //ArrayList<String> miembros = new ArrayList<>();
-
+                
                 for (String gName : Groups) {
                     report += gName + "\n";
                     for (String SingleStudent : basedato.getStudentsInGroup(gName)) {
-                        //Since by id there is only one student, there's no fear of missing more answers
-                        ArrayList<ArrayList<String>> datosBD = basedato.getStudent(SingleStudent, "user");
-                        for (ArrayList<String> als : datosBD) {
-                            StudentData.put(SingleStudent, als);
-                        }
+                        Map<String, String> datosBD = basedato.getStudent(SingleStudent, "user");
+                        StudentData.put(SingleStudent, datosBD);
                     }
                     report += makeReport(StudentData);
-                    //report += "\n";
 
                 }
                 // Converting to string for Printing
@@ -135,7 +110,7 @@ public class StudentInfo extends GeneralBehavior {
 
             //----------------------------------------------------------------------------
             if (requestProperties.get("--add") != null) {
-            //System.out.println("\n\n add\n\n");
+                //System.out.println("\n\n add\n\n");
                 ArrayList<String> newStudent = new ArrayList<>();
 
                 for (String s : requestProperties.get("--add")) {
@@ -183,85 +158,127 @@ public class StudentInfo extends GeneralBehavior {
 
     }
 
-    public String makeReport(Map<String, List<String>> StudentData) 
-    {
-        
-        String respuesta = "```";
-        String [] headers ={"Username","Name" , "Last Name" , "Birthday" , "Sign up Date" , "Type" , "Coach's Name" , "Coach's lastN"};
-        //Object [] firstVals = StudentData.keyet().toArray();
-        //System.out.println("\n ye 1 \n" );
-        ArrayList<List<String>> table = new ArrayList<>(StudentData.values());
+    public String makeReport(Map<String, Map<String, String>> StudentData) {
 
-        //List<String>[] table = StudentData.values().toArray(new List<String>[]);
-       
-        int [] values = getSpaces(headers, table );
-        
-        Set<Map.Entry<String, List<String>>> entrySet = StudentData.entrySet();
-        
-        for(int i = 0 ; i< headers.length ; i++)
-        {
+        String respuesta = "";
+        String[] headers = {"Username", "Name", "Last Name", "Birthday", "E-mail", "Sign in Date", "Type", "Coach's Name", "Coach's lastN"};
+        String[] keys = {"user", "Name", "LastName", "BirthDay", "email", "SignInD", "Type", "CName", "CLastName"};
+        Collection<Map<String, String>> table = StudentData.values();
+
+        int[] values = getSpaces(headers, table);
+
+        Set<Map.Entry<String, Map<String, String>>> entrySet = StudentData.entrySet();
+
+        for (int i = 0; i < headers.length; i++) {
             respuesta += headers[i];
-            
-            for(int j = headers[i].length() ; j <= values[i] ; j++ )
-            {
+
+            for (int j = headers[i].length(); j <= values[i]; j++) {
                 respuesta += " ";
             }
-            if(i != headers.length-1)
-            respuesta += " | ";
+            if (i != headers.length - 1) {
+                respuesta += " | ";
+            }
         }
-        int total_length= respuesta.length();
+        int total_length = respuesta.length();
         respuesta += "\n";
-        for(int i = 0; i <= total_length ; i++)
-        {
+        for (int i = 0; i <= total_length; i++) {
             respuesta += "-";
         }
-        
+
         respuesta += "\n";
-        
-        for(Map.Entry<String, List<String>> x : entrySet) {
+
+        for (Map.Entry<String, Map<String, String>> x : entrySet) {
             //respuesta += x.getKey();
-            int i = 0;
-            for (String s : x.getValue()) {
-                
-                respuesta +=  s;
-                for(int j = s.length() ; j <= values[i] ; j++ )
-                {
+            for (int i = 0; i < keys.length; i++) {
+
+                String val = x.getValue().get(keys[i]);
+                System.out.println("i= " + i + " Key: " + keys[i] + " value :" + val);
+                if (val == null) {
+                    for (int j = 0; j <= values[i]; j++) {
+                        respuesta += " ";
+                    }
+                    if (i != headers.length - 1) {
+                        respuesta += " | ";
+                    }
+                    continue;
+                }
+                respuesta += val;
+
+                for (int j = val.length(); j <= values[i]; j++) {
                     respuesta += " ";
                 }
-                if(i != headers.length-1)
-                     respuesta += " | ";
-                i++;
+                if (i != headers.length - 1) {
+                    respuesta += " | ";
+                }
             }
-               respuesta += "\n";
-            
+            respuesta += "\n";
+
         }
-        respuesta += "\n```";
-        
-        
-        
+        respuesta += "\n";
+
         return respuesta;
     }
-    
-    public int[] getSpaces(String[] headers, ArrayList<List<String>> values)
-    {
+
+    public int[] getSpaces(String[] headers, Collection<Map<String, String>> map) {
+        String[] keys = {"user", "Name", "LastName", "BirthDay", "email", "SignInD", "Type", "CName", "CLastName"};
         int[] spaces = new int[headers.length];
-     
+
+        ArrayList<Map<String, String>> values = new ArrayList<>(map);
         Arrays.fill(spaces, 0);
-        
-        for(int i = 0 ; i < headers.length ; i++ )
-        {
-            
-            if(headers[i].length() > spaces[i] )
-                spaces[i] = headers[i].length(); 
-            for (List<String> value : values) 
-            {
-                if(value.get(i).length() >  spaces[i] )
-                {
-                    spaces[i] = value.get(i).length();  
+
+        for (int i = 0; i < headers.length; i++) {
+
+            if (headers[i].length() > spaces[i]) {
+                spaces[i] = headers[i].length();
+            }
+            for (Map<String, String> value : values) {
+                if (value.get(keys[i]) == null) {
+                    continue;
+                }
+
+                if (value.get(keys[i]).length() > spaces[i]) {
+                    spaces[i] = value.get(keys[i]).length();
                 }
             }
         }
         return spaces;
+    }
+    
+    public String manageJudge(Map<String, List<String>> requestProperties) throws SQLException, ClassNotFoundException {
+        String answer="";
+        
+        BD dataBase = new BD();
+        if(requestProperties.get("--user")!= null)
+        {
+            List<String> users = requestProperties.get("--user");
+            if(users.size()!=1)
+            {
+                return "Must specify one username per command!";
+            }
+            System.out.println("1\n");
+            if(dataBase.studentExists(users.get(0)))
+            {
+                List<String> args = requestProperties.get("--judge");
+                for (String relation : args)
+                {
+                    String [] OJ_Student = relation.split("=");
+                    if(dataBase.nickExists(users.get(0),OJ_Student[0]))
+                    {
+                        System.out.println("2\n");
+                        dataBase.updateNickStudent(users.get(0),OJ_Student[0],OJ_Student[1]);
+                        
+                        answer += "Values altered for student " + users.get(0) + "!\n";
+                    }
+                    System.out.println("3\n");
+                    dataBase.insertNickStudent(users.get(0),OJ_Student[0],OJ_Student[1]);
+                } 
+                return "Nickname added!";
+            }
+            
+        }
+        else return "Must specify username!";
+        
+        return answer;
     }
 
 }

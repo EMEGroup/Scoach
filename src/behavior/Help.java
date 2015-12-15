@@ -11,6 +11,8 @@ public class Help extends GeneralBehavior{
 		+ "Available commands:\n"
 		+ "    echo                                 Repeats what you write.\n"
 		+ "    submissions                          Show submissions of an user.\n"
+                + "    contestants                          Search, add and delete contestants' information\n"
+                + "    group                                Make groups contastants for a quicker search\n"
 		+ "    help                                 Displays this help text.\n"
 		+ "    compare                              Displays a brief report of the performance of a list of contestants.\n"
 		+ "For more info about a specific command, run help <command>."
@@ -24,8 +26,9 @@ public class Help extends GeneralBehavior{
 		commandsHelp.put("echo", Echo.HELPTEXT);
 		commandsHelp.put("help", Help.HELPTEXT);
 		commandsHelp.put("submissions", Submissions.HELPTEXT);
-		commandsHelp.put("student", StudentInfo.HELPTEXT);
+		commandsHelp.put("contestants", StudentInfo.HELPTEXT);
 		commandsHelp.put("compare", Compare.HELPTEXT);
+                commandsHelp.put("group", Group.HELPTEXT);
 	}
 	
 	@Override

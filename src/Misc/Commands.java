@@ -2,6 +2,8 @@ package Misc;
 
 import behavior.*;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -84,9 +86,8 @@ public class Commands {
 
         talking.stopThread();
 
-        String text = result.get("text");
+        String text = "```" + result.get("text") + "```";
         requestProperties.put("text", Arrays.asList(new String[]{text}));
-        System.out.println(text);
         try {
             GeneralStuff._sendMessage(GeneralStuff._forgeMessage(requestProperties));
         } catch (IOException ex) {
@@ -98,21 +99,34 @@ public class Commands {
     public void group(Map<String, List<String>> requestProperties) {
         UnitofInteraction talking = new UnitofInteraction(requestProperties);
         talking.startThread();
+        
         Group _group = new Group();
-
-        Map<String, String> result
-                = _group.Run(GeneralStuff._getArguments(requestProperties));
-
-        talking.stopThread();
-
-        if (result == null) {
-            return;
+        Map<String, String> result = null;
+        
+        try {
+            result = _group.Run(GeneralStuff._getArguments(requestProperties));
+            
+        } catch (Exception ex) {
+             StringWriter str = new StringWriter();
+             PrintWriter writer = new PrintWriter(str);
+             ex.printStackTrace(writer);
+             System.out.println(str.getBuffer().toString());
+            talking.notifyError();
+            
+        } finally {
+            talking.stopThread();
         }
 
-        String text = result.get("text");
-        //System.out.println("\n\n Texto recibido \n"  + text);
+        talking.stopThread();
+        String text =  result.get("text") ;
         requestProperties.put("text", Arrays.asList(new String[]{text}));
-
+        //System.out.println ("----\n " + requestProperties.get("text").get(0)+ "----\n ");
+                
+        try {
+            GeneralStuff._sendMessage(GeneralStuff._forgeMessage(requestProperties));
+        } catch (IOException ex) {
+            Logger.getLogger(Commands.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     public void compare(Map<String, List<String>> requestProperties) {
