@@ -172,6 +172,9 @@ public class Recommendations extends GeneralBehavior{
 		if( members.isEmpty() )
 			return forgeErrorMessage(NOCONTESTANTSMSG);
 		
+		// DEBUG:
+		System.out.println("Submissions before filter = " + problemsList.size());
+		
 		// Wipe out the problems already solved by the contestants
 		for(String handle : members){
 			
@@ -189,14 +192,21 @@ public class Recommendations extends GeneralBehavior{
 			
 			// Get a list of the problems not repeating them more than once
 			for(Submission sub : subs){
-				if( probs.contains(sub.getProblem()) == false )
+				if( probs.contains(sub.getProblem()) == false ){
 					probs.add(sub.getProblem());
+					
+					// DEBUG:
+					System.out.println("Removed " + sub.getProblem().toString());
+				}
 			}
 			
 			// Remove the solved ones from the potential recommendations
 			problemsList.removeAll(probs);
 			
 		}
+		
+		// DEBUG:
+		System.out.println("Submissions after filter = " + problemsList.size());
 		
 		// Sort by the amount of users that have solved those problems
 		Collections.sort(problemsList);

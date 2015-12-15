@@ -47,7 +47,7 @@ public class Group extends GeneralBehavior {
 
                 //it.remove(); // avoids a ConcurrentModificationException
             String group = (String) pair.getKey();
-            group = group.toLowerCase();
+            group = group.toLowerCase().substring(2,group.length());
             List<String> students = (List<String>) pair.getValue();
             //answer += "\nGroup: \"" + group + "\" - Students:" + students+ " \n";
 

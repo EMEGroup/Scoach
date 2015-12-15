@@ -406,7 +406,7 @@ public class BD {
                 "admin7wbaict", "Exf6tmuYJXWh");
         con.setAutoCommit(false);
 
-        String sql = "insert into grupo values( '" + group.toLowerCase().substring(2, group.length()) + "' )";
+        String sql = "insert into grupo values( '" + group.toLowerCase() + "' )";
         Statement stmt = con.createStatement();
         stmt.executeUpdate(sql);
         con.commit();
@@ -426,7 +426,7 @@ public class BD {
                     "admin7wbaict", "Exf6tmuYJXWh");
             con.setAutoCommit(false);
 
-            sql = "insert into grupo_estudiante values( '" + group.toLowerCase().substring(2, group.length()) + "' , " + String.valueOf(getStudentID(s)) + " )";
+            sql = "insert into grupo_estudiante values( '" + group.toLowerCase() + "' , " + String.valueOf(getStudentID(s)) + " )";
             Statement stmt = con.createStatement();
             stmt.executeUpdate(sql);
             con.commit();
