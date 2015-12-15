@@ -64,7 +64,6 @@ public class GeneralStuff {
 		});
                 
 		COMMANDS.put("recommend", new Command(){
-
 			@Override
 			public void execute(Map<String, List<String>> req){ C.recommendations(req); }
 		});
