@@ -40,7 +40,7 @@ public class smtpMailSend
 			Session session = Session.getDefaultInstance(props, auth);
 			Transport transport = session.getTransport("smtps");
 
-			// Set to true to activate SMTP debugging
+			// Uncomment to activate SMTP debugging
 			// session.setDebug(true);
 
 			// create a message

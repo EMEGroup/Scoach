@@ -1,10 +1,15 @@
 package behavior;
 
+import Misc.BD;
 import Misc.GeneralStuff;
+import static Misc.GeneralStuff._forgeErrorMessage;
 import codeforcesInfo.Methods;
+import codeforcesInfo.Methods.ProblemVerdict;
 import codeforcesInfo.Problem;
 import codeforcesInfo.ProblemStatistics;
+import codeforcesInfo.Submission;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -12,7 +17,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import javax.mail.AuthenticationFailedException;
 import javax.mail.MessagingException;
 import netHandling.smtpMailSend;
 
@@ -58,6 +62,11 @@ public class Recommendations extends GeneralBehavior{
 		+ "i could have ignored that and still have done my work, but you know  ..."
 		+ "i decided it's better to notify you about this, have a nice day btw. :)"
 		+ "```";
+	private static final String NOCONTESTANTSMSG = "```"
+		+ "Sorry but the passed groupname, even existing, does not contain or reference "
+		+ "any contestant, in other words it is an empty group, please wolve this "
+		+ "out and try again."
+		+ "```";
 	
 	private class ProblemStatsInfo implements Comparable<ProblemStatsInfo>{
 		private Problem problem;
@@ -95,7 +104,7 @@ public class Recommendations extends GeneralBehavior{
 	}
 	
     @Override
-    public Map<String, String> Run(Map<String, List<String>> requestProperties) throws MessagingException, IOException, Exception{
+    public Map<String, String> Run(Map<String, List<String>> requestProperties) throws MessagingException, IOException, SQLException, ClassNotFoundException{
         
 		Map<String, String> responseProperties = new HashMap<String, String>();
 		
@@ -103,19 +112,21 @@ public class Recommendations extends GeneralBehavior{
 		int amount = 3;
 		int popularity = 1;
 		List<String> tags = null;
-		List<String> members = null;
+		List<String> members, nicks;
+		
+		BD databaseInstance = new BD();
 		
 		/*
 		TODO:
-		X Conseguir nombres de estudiantes dado un grupo.
+		O Conseguir nombres de estudiantes dado un grupo.
 		O Conseguir todos los problemas de codeforces.
 		O Filtar los problemas que quedan por los tags dados.
-		X Ignorar todos los problemas resueltos entre el conjunto del grupo.
+		O Ignorar todos los problemas resueltos entre el conjunto del grupo.
 		X Determinar el peor de los miembros del equipo.
 		O Ordenar por dificultad. (Cantidad de gente que lo ha resuelto)
 		O Escoger alguno(s) ...
-		Enviar mensajes a los integrantes del grupo (permitir al usuario no hacerlo)
-		Descomentar la salida a Slack
+		O Enviar mensajes a los integrantes del grupo (permitir al usuario no hacerlo)
+		O Descomentar la salida a Slack
 		*/
 		
 		if( requestProperties.get("--groupname") != null ){
@@ -135,7 +146,15 @@ public class Recommendations extends GeneralBehavior{
 			amount = Integer.parseInt(
 				requestProperties.get("--amount").get(0) );
 		}
-			
+		
+		// Sanity check
+		if (popularity > 5 || popularity < 1)
+			return _forgeErrorMessage(POPULARITYERRORMSG);
+		else if ( databaseInstance.GroupExists(groupName) == false )
+			return _forgeErrorMessage(GROUPNAMEERRORMSG);
+		else if ( amount < 0 )
+			return _forgeErrorMessage(AMOUNTINVALIDMSG);
+		
 		// Get all problems
 		List<SimpleEntry<Problem, ProblemStatistics>> problemsByTag = 
 			Methods.getProblems(tags);
@@ -147,15 +166,55 @@ public class Recommendations extends GeneralBehavior{
 				new ProblemStatsInfo(entry.getKey(), entry.getValue()) );
 		}
 		
-		// Sanity check
-		if (popularity > 5 || popularity < 1)
-			return forgeErrorMessage(POPULARITYERRORMSG);
-//		else if ( <check for group's name inside the database> )
-//			return forgeErrorMessage(GROUPNAMEERRORMSG);
-		else if ( amount < 0 )
-			return forgeErrorMessage(AMOUNTINVALIDMSG);
-		else if ( problemsByTag == null || problemsByTag.isEmpty() )
-			return forgeErrorMessage(NOPROBLEMSMSG);
+		if ( problemsByTag == null || problemsByTag.isEmpty() )
+			return _forgeErrorMessage(NOPROBLEMSMSG);
+		
+		// Get the contestant's usernames and nicknames
+		members = databaseInstance.getStudentsInGroup(groupName);
+		if( members.isEmpty() )
+			return _forgeErrorMessage(NOCONTESTANTSMSG);
+		
+		nicks = databaseInstance.getNicksInGroup(groupName,"codeforces");
+		
+		// Wipe out the problems already solved by the contestants
+		for(String handle : nicks){
+			
+			List<Submission> subs = Methods.getSubmissions(handle, null, null, null, null);
+			
+			// Keep only the accepted ones
+			for(int i = 0; i < subs.size(); i++){
+				if( subs.get(i).getVerdict() != ProblemVerdict.OK ){
+					subs.remove(i);
+					i--;
+				}
+			}
+			
+			List<Problem> probs = new ArrayList<Problem>();
+			
+			// Get a list of the problems not repeating them more than once
+			for(Submission sub : subs){
+				if( probs.contains(sub.getProblem()) == false ){
+					probs.add(sub.getProblem());
+				}
+			}
+			
+			// Remove the solved ones from the potential recommendations
+			for( int i = 0; i < problemsList.size(); i++ ){
+				
+				for( int j = 0; j < probs.size(); j++){
+					Problem a = problemsList.get(i).getProblem();
+					Problem b = probs.get(j);
+					
+					if( a.getContestId() == b.getContestId() && a.getIndex().equals(b.getIndex()) ){
+						problemsList.remove(i);		i--;
+						probs.remove(j);		j--;
+					}
+					
+				}
+				
+			}
+			
+		}
 		
 		// Sort by the amount of users that have solved those problems
 		Collections.sort(problemsList);
@@ -192,7 +251,7 @@ public class Recommendations extends GeneralBehavior{
 		
 		// When all the filtering is done, if no problems to recommend ... :/
 		if( problemsList.isEmpty() )
-			return forgeErrorMessage(TOOSPECIFICMSG);
+			return _forgeErrorMessage(TOOSPECIFICMSG);
 		
 		// Return some info about this problem to the Slack and to the users emails
 		// so the contestants can identify the problem and find it with ease.
@@ -219,14 +278,24 @@ public class Recommendations extends GeneralBehavior{
 		responseProperties.put("text", "```" + text + problemsSummary + "```");
 		// Send an email to the contestants with the suggested problems
 		
-		String[] recipients = new String[]{"ScoachBot@openmailbox.org"};
+		// Get contestants emails to send them homework :)
+		List<String> emails = new ArrayList<String>();
+		
+		for(String username : members){
+			Map<String, String> userInfo = databaseInstance.getStudent(username, "user");
+			
+			emails.add( userInfo.get("email") );
+		}
+		
+		String[] recipients = emails.toArray(new String[]{});
 		String sender = GeneralStuff.EMAILSENDERNAME;
 		String subject = "Here are some new problems for you to try out !";
 		String msgTxt =  "Hi, your coach has asked me to recommend you some "
 			+ "problems, here go my suggestions:\n\n" + problemsSummary
 			+ "\nHave a nice day :^]";
 		
-		smtpMailSend mailSender = new smtpMailSend(recipients, sender, subject, msgTxt);
+		smtpMailSend mailSender = new smtpMailSend(
+			recipients, sender, subject, msgTxt);
 		
 		try {
 			mailSender.postMail();
@@ -260,14 +329,6 @@ public class Recommendations extends GeneralBehavior{
 		}
 		
 		return 0;	// else return 0, this will take every single problem
-	}
-	
-	private Map<String, String> forgeErrorMessage(String errorMessage){
-		
-		Map<String, String> returnObject = new HashMap<String, String>();
-		returnObject.put("text", errorMessage);
-		
-		return returnObject;
 	}
 	
 }
