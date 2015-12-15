@@ -23,7 +23,7 @@ import java.util.Set;
  */
 public class StudentInfo extends GeneralBehavior {
 
-    public static final String HELPTEXT = "``` student             Get information about a student\n"
+    public static final String HELPTEXT = "``` contestants             Get information about a conta\n"
             + "--nick                           search by contestant's nickname on OJ\n"
             + "--user                           search by contestant's username\n"
             + "                                  use with --judge to give a user a nick in OJ\n"
@@ -32,7 +32,9 @@ public class StudentInfo extends GeneralBehavior {
             + "--add                             add contestant \n"
             + "                                 (args.: username, contestant'sName, contestant'sLastName,\n"
             + "                                         Contestan'sBirthDay (1/dec/2015),  ) \n "
-            + "--rm                              remove contestant with his username"
+            + "--rm                              remove contestant with his username\n"
+            + "--show-nicks                       Show Nicks of existing user\n"
+            + "                                     Ex: contestants --show-nicks OJ,username"
             + "For more info about a specific command, run help <command>.```";
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////---add NYI
@@ -73,16 +75,14 @@ public class StudentInfo extends GeneralBehavior {
                     }
 
                     for (String s : students) {
-                        StudentData.put(s, basedato.getStudent(s, op.replace('-', ' ').trim()));
+                        StudentData.put(s, basedato.getStudent(s, op.substring(2, op.length())));
                     }
                     // Converting to string for Printing
                     responseProperties.put("text", makeReport(StudentData));
                     return responseProperties;
-
                 }
                 
-            }
-            
+            }       
 
             //------------------------------------------------------------------------------------------
             if (requestProperties.get("--group") != null) {
@@ -138,6 +138,20 @@ public class StudentInfo extends GeneralBehavior {
                 if (basedato.studentExists(delStudent)) {
                     basedato.rmStudent(delStudent);
                     responseProperties.put("text", "Student deleted!\n");
+                    return responseProperties;
+                }
+
+                // Converting to string for Printing
+                responseProperties.put("text", "Student not Found!\n");
+                return responseProperties;
+
+            }
+            if (requestProperties.get("--show-nicks") != null) {
+                String Student = requestProperties.get("--show-nicks").get(1);
+                String OJ = requestProperties.get("--show-nicks").get(0);   
+                if (basedato.studentExists(Student)) {
+                    System.out.println("Show Nicks");
+                    responseProperties.put("text", Student+ "'s Nicks in " + OJ +":\n"+ basedato.getStudentsNicks(Student,OJ));
                     return responseProperties;
                 }
 
@@ -283,5 +297,4 @@ public class StudentInfo extends GeneralBehavior {
         
         return answer;
     }
-
 }

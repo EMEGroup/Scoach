@@ -223,7 +223,42 @@ public class BD {
 
     }
     
-//This is the method
+    
+        public ArrayList<String> getStudentsNicks(String stud, String OJ) throws SQLException, ClassNotFoundException {
+            
+            Class.forName("org.postgresql.Driver");
+
+        Connection con = DriverManager.getConnection("jdbc:postgresql://127.10.65.2:5432/scoach",
+                "admin7wbaict", "Exf6tmuYJXWh");
+        con.setAutoCommit(false);
+
+        ArrayList<String> tabla = new ArrayList<String>();
+        ResultSet rs;
+        String sql=" select Estudiante.username as user, Estudiante_Juez.alias as nick \n" +
+                        "        from Estudiante,  Estudiante_juez , Juez \n" +
+                        "        where \n" +
+                        "        Estudiante.username = '" + stud + "' AND\n" +
+                        "        Estudiante.id_Estudiante = Estudiante_Juez.id_estudiante AND \n" +
+                        "        Estudiante_juez.id_Juez = Juez.Id_Juez AND \n" +
+                        "        lower(Juez.Nombre) = lower('" + OJ + "')";
+        Statement stmt = con.createStatement();
+        rs = stmt.executeQuery(sql);
+        while (rs.next()) {
+            tabla.add(rs.getString("nick"));
+        }
+
+        stmt.close();
+
+        con.close();
+            
+            
+
+        
+        return tabla;
+        }
+    
+    
+       //This is the method
     public ArrayList<String> getNicksInGroup(String group, String OJ) throws SQLException, ClassNotFoundException {
         Class.forName("org.postgresql.Driver");
 
