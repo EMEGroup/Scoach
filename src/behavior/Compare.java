@@ -1,7 +1,10 @@
 package behavior;
 
+import Misc.BD;
+import static Misc.GeneralStuff._forgeErrorMessage;
 import codeforcesInfo.Submission;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,22 +24,34 @@ public class Compare extends GeneralBehavior {
 		+ "NOTE: Months are being treated as 30 days intervals."
 		+ "```";
 	
+	private final static String INVALIDTEAMNAMEMSG = "```"
+		+ "The passed team name is not valid, it means it does not exist in the database."
+		+ "```";
+	private final static String NOCONTESTANTSMSG = "```"
+		+ "The passed team does not contain a single contestant ... please add some "
+		+ "beforehand or call this command with the --nicks argument and pass their nicks instead."
+		+ "```";
+	
 	private final static String[] VERDICTS = 
 		{"AC", "PE", "WA", "TLE", "RTE", "MLE", "CE", "HACKED"};
 	
 	@Override
-	public Map<String, String> Run(Map<String, List<String>> requestProperties) throws IOException {
+	public Map<String, String> Run(Map<String, List<String>> requestProperties) throws IOException, SQLException, ClassNotFoundException {
 		
-		int usernameMaxSize = 25;
+		final int usernameMaxSize = 15;
+		final int nicknameMaxSize = 15;
 		ArrayList<String> handles = null;
+		ArrayList<String> usernames = null;
+		String teamname;
 		String verdict = null;
 		String time = null;
 		Long startingTime = null;
 		Integer count = null;
 		List<String> tags = null;
-		Map<String, String> returnObject = null;
 		
-		returnObject = new HashMap<String, String>();
+		Map<String, String> returnObject = new HashMap<String, String>();
+		
+		BD databaseInstance = new BD();
 		
 		// Get handles/nicknames by the name of the team: NOT IMPLEMENTED
 		// This way must check in the database for the members of a team
@@ -45,7 +60,7 @@ public class Compare extends GeneralBehavior {
 		if( requestProperties.get("--nicks") != null ){
 			handles = new ArrayList<String>(requestProperties.get("--nicks"));
 			
-			// Make sure each handle is unique
+			// Make sure each nickname is unique
 			for(int i = 0; i < handles.size(); i++){
 				for(int j = i+1; j < handles.size(); j++){
 					if( handles.get(i).equals( handles.get(j) ) == true ){
@@ -54,6 +69,24 @@ public class Compare extends GeneralBehavior {
 					}
 				}
 			}
+			
+		} else if( requestProperties.get("--team") != null ){
+			teamname = requestProperties.get("--team").get(0);
+			
+			// Make sure the team exists in the database
+			if( databaseInstance.GroupExists(teamname) == false){
+				return _forgeErrorMessage(INVALIDTEAMNAMEMSG);
+			}
+			
+			// Get the usernames for the final report layout
+			usernames = databaseInstance.getStudentsInGroup(teamname);
+			
+			// Get the nicknames as well
+			handles = databaseInstance.getNicksInGroup(teamname, "codeforces");
+		}
+		
+		if( handles == null || handles.isEmpty() ){
+			return _forgeErrorMessage(NOCONTESTANTSMSG);
 		}
 		
 		// Get the starting time for the comparison
@@ -92,10 +125,18 @@ public class Compare extends GeneralBehavior {
 			text += " for all submissions:\n";
 		}
 		
-		text += "Username ";
+		if( usernames != null ){
+			text += "Username ";
+		
+			// String formatting, just beautiness
+			for(int i = 0; i < usernameMaxSize-"Username".length(); i++)
+				text += " ";
+		}
+		
+		text += "Nickname ";
 		
 		// String formatting, just beautiness
-		for(int i = 0; i < usernameMaxSize-"Username".length(); i++)
+		for(int i = 0; i < nicknameMaxSize-"Nickname".length(); i++)
 			text += " ";
 		
 		text += "Submissions     ";
@@ -108,18 +149,34 @@ public class Compare extends GeneralBehavior {
 		}
 		text += "\n";
 		
-		for(int i = 0; i < 132; i++) text += "-";	// Title line
+		int len = 132;
+		
+		if( usernames != null )
+			len = 140;
+		
+		for(int i = 0; i < len; i++) text += "-";	// Title line
 		text += "\n";
 		
-		for(String handle : handles){
+		for(int l = 0; l < handles.size(); l++){
+			String handle = handles.get(l);
+			
 			List<Submission> submissionsList = codeforcesInfo.Methods.getSubmissions(
 				handle, startingTime, count, verdict, tags);
 			
 			Map<String, Integer> summary = _summary(submissionsList);
 			
+			if( usernames != null ){
+				String username = usernames.get(l);
+				text += username;
+
+				for(int i = 0; i < usernameMaxSize-username.length(); i++)
+					text += " ";
+				text += " ";
+			}
+			
 			text += handle;
 			
-			for(int i = 0; i < usernameMaxSize-handle.length(); i++)
+			for(int i = 0; i < nicknameMaxSize-handle.length(); i++)
 				text += " ";
 			text += " ";
 			

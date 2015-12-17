@@ -4,6 +4,7 @@ import behavior.*;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -141,7 +142,11 @@ public class Commands {
             result = _compare.Run(GeneralStuff._getArguments(requestProperties));
         } catch (IOException ex) {
             talking.notifyError();
-        } finally {
+        } catch (SQLException ex) {
+			talking.notifyError();
+		} catch (ClassNotFoundException ex) {
+			talking.notifyError();
+		} finally {
             talking.stopThread();
         }
 
@@ -179,9 +184,16 @@ public class Commands {
 		} catch (MessagingException ex) {
 			result.put("text", result.get("text") + "`" + ex.getMessage() + "`");
 			talking.notifyError();
-		} catch (Exception ex) {
+		} catch (IOException ex) {
+			Logger.getLogger(Commands.class.getName()).log(Level.SEVERE, null, ex);
 			talking.notifyError();
-		} finally {
+		} catch (SQLException ex) {
+			Logger.getLogger(Commands.class.getName()).log(Level.SEVERE, null, ex);
+			talking.notifyError();
+		} catch (ClassNotFoundException ex) {
+			Logger.getLogger(Commands.class.getName()).log(Level.SEVERE, null, ex);
+			talking.notifyError();
+		}  finally {
 			talking.stopThread();
 		}
 		

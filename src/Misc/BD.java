@@ -35,7 +35,7 @@ public class BD {
             sql = "select Estudiante.username as user , Estudiante.nombre,Estudiante.apellido, Estudiante.fecha_nacimiento, Estudiante.email as email, Estudiante.fecha_ingreso,  Grado.tipo ,  Coach.Nombre as SNOMBRE, coach.apellido as SAPELLIDO \n"
                     + "from estudiante, grado, coach, Estudiante_Juez \n"
                     + "where  estudiante.id_estudiante  = Estudiante_Juez.id_estudiante AND\n"
-                    + "Estudiante_Juez.nick = '" + est + "' AND  \n"
+                    + "Estudiante_Juez.alias = '" + est + "' AND  \n"
                     + "grado.id_grado = estudiante.grado AND estudiante.coach = coach.id_Coach ;";
         } else if (specify.toLowerCase().compareTo("name") == 0) {
 
@@ -406,7 +406,7 @@ public class BD {
                 "admin7wbaict", "Exf6tmuYJXWh");
         con.setAutoCommit(false);
 
-        String sql = "insert into grupo values( '" + group.toLowerCase().substring(2, group.length()) + "' )";
+        String sql = "insert into grupo values( '" + group.toLowerCase() + "' )";
         Statement stmt = con.createStatement();
         stmt.executeUpdate(sql);
         con.commit();
@@ -426,7 +426,7 @@ public class BD {
                     "admin7wbaict", "Exf6tmuYJXWh");
             con.setAutoCommit(false);
 
-            sql = "insert into grupo_estudiante values( '" + group.toLowerCase().substring(2, group.length()) + "' , " + String.valueOf(getStudentID(s)) + " )";
+            sql = "insert into grupo_estudiante values( '" + group.toLowerCase() + "' , " + String.valueOf(getStudentID(s)) + " )";
             Statement stmt = con.createStatement();
             stmt.executeUpdate(sql);
             con.commit();
