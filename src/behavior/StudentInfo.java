@@ -48,27 +48,30 @@ public class StudentInfo extends GeneralBehavior {
         options.add("--nick");
         options.add("--user");
         options.add("--name");
-        
+
         BD basedato = new BD();
 
         List<String> students = new ArrayList<String>();
         Map<String, Map<String, String>> StudentData = new HashMap<String, Map<String, String>>();
         try {
-            for(String op : options)
-            {
-                if (requestProperties.get(op) != null) 
-                {
-                    if(requestProperties.get("--judge")!= null)
-                    {
+
+            if (requestProperties.get("--show-all") != null) {
+                responseProperties.put("text", showAll());
+                return responseProperties;
+
+            }
+            for (String op : options) {
+                if (requestProperties.get(op) != null) {
+
+                    if (requestProperties.get("--judge") != null) {
                         responseProperties.put("text", manageJudge(requestProperties));
                         return responseProperties;
                     }
                     List<String> Data = requestProperties.get(op);
-                    if(Data ==null)
-                    {
+                    if (Data == null) {
                         responseProperties.put("text", "Tag not found!\n");
                         return responseProperties;
-                        
+
                     }
                     for (String s : Data) {
                         students.add(s);
@@ -81,19 +84,19 @@ public class StudentInfo extends GeneralBehavior {
                     responseProperties.put("text", makeReport(StudentData));
                     return responseProperties;
                 }
-                
-            }       
+
+            }
 
             //------------------------------------------------------------------------------------------
             if (requestProperties.get("--group") != null) {
-               
+
                 ArrayList<String> Groups = new ArrayList<String>();
                 String report = "";
 
                 for (String s : requestProperties.get("--group")) {
                     Groups.add(s);
                 }
-                
+
                 for (String gName : Groups) {
                     report += gName + "\n";
                     for (String SingleStudent : basedato.getStudentsInGroup(gName)) {
@@ -148,10 +151,10 @@ public class StudentInfo extends GeneralBehavior {
             }
             if (requestProperties.get("--show-nicks") != null) {
                 String Student = requestProperties.get("--show-nicks").get(1);
-                String OJ = requestProperties.get("--show-nicks").get(0);   
+                String OJ = requestProperties.get("--show-nicks").get(0);
                 if (basedato.studentExists(Student)) {
                     System.out.println("Show Nicks");
-                    responseProperties.put("text", Student+ "'s Nicks in " + OJ +":\n"+ basedato.getStudentsNicks(Student,OJ));
+                    responseProperties.put("text", Student + "'s Nicks in " + OJ + ":\n" + basedato.getStudentsNicks(Student, OJ));
                     return responseProperties;
                 }
 
@@ -164,10 +167,10 @@ public class StudentInfo extends GeneralBehavior {
         } catch (SQLException ex) {
             responseProperties.put("text", "Problem searching database.");
             return responseProperties;
-        } catch (ClassNotFoundException ex){
-			responseProperties.put("text", "Problem searching database.");
+        } catch (ClassNotFoundException ex) {
+            responseProperties.put("text", "Problem searching database.");
             return responseProperties;
-		}
+        }
 
         responseProperties.put("text", HELPTEXT);
 
@@ -260,41 +263,49 @@ public class StudentInfo extends GeneralBehavior {
         }
         return spaces;
     }
-    
+
     public String manageJudge(Map<String, List<String>> requestProperties) throws SQLException, ClassNotFoundException {
-        String answer="";
-        
+        String answer = "";
+
         BD dataBase = new BD();
-        if(requestProperties.get("--user")!= null)
-        {
+        if (requestProperties.get("--user") != null) {
             List<String> users = requestProperties.get("--user");
-            if(users.size()!=1)
-            {
+            if (users.size() != 1) {
                 return "Must specify one username per command!";
             }
-            
-            if(dataBase.studentExists(users.get(0)))
-            {
+
+            if (dataBase.studentExists(users.get(0))) {
                 List<String> args = requestProperties.get("--judge");
-                for (String relation : args)
-                {
-                    String [] OJ_Student = relation.split("=");
-                    if(dataBase.nickExists(users.get(0),OJ_Student[0]))
-                    {
-                    
-                        dataBase.updateNickStudent(users.get(0),OJ_Student[0],OJ_Student[1]);
-                        
+                for (String relation : args) {
+                    String[] OJ_Student = relation.split("=");
+                    if (dataBase.nickExists(users.get(0), OJ_Student[0])) {
+
+                        dataBase.updateNickStudent(users.get(0), OJ_Student[0], OJ_Student[1]);
+
                         answer += "Values altered for student " + users.get(0) + "!\n";
+                    } else {
+                        dataBase.insertNickStudent(users.get(0), OJ_Student[0], OJ_Student[1]);
                     }
-                    else
-                    dataBase.insertNickStudent(users.get(0),OJ_Student[0],OJ_Student[1]);
-                } 
+                }
                 return answer + "Nickname added!";
             }
-            
+
+        } else {
+            return "Must specify username!";
         }
-        else return "Must specify username!";
-        
+
         return answer;
     }
+
+    public String showAll() throws SQLException, ClassNotFoundException {
+        String answer = "";
+
+        BD dataBase = new BD();
+
+        answer = makeReport(dataBase.getAllStudents());
+
+        return answer;
+
+    }
+
 }

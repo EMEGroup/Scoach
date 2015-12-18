@@ -289,6 +289,56 @@ public class BD {
         return tabla;
     }
 
+    
+     public Map<String,Map<String,String>> getAllStudents() throws SQLException, ClassNotFoundException {
+        Class.forName("org.postgresql.Driver");
+
+        Connection con = DriverManager.getConnection("jdbc:postgresql://127.10.65.2:5432/scoach",
+                "admin7wbaict", "Exf6tmuYJXWh");
+        con.setAutoCommit(false);
+
+        Map<String,Map<String,String>> tabla = new HashMap<>();
+        ResultSet rs;
+
+        String sql = "select Estudiante.username as user , Estudiante.nombre, Estudiante.apellido, Estudiante.fecha_nacimiento, Estudiante.email as email , \n"
+                    + "Estudiante.fecha_ingreso,  Grado.tipo ,  \n"
+                    + "Coach. Nombre as SNOMBRE, coach.apellido as SAPELLIDO\n"
+                    + "from estudiante, grado, coach\n"
+                    + "where \n"
+                    + "grado.id_grado = estudiante.grado AND\n"
+                    + "estudiante.coach = coach.id_Coach";
+
+        Statement stmt = con.createStatement();
+        rs = stmt.executeQuery(sql);
+            
+        while(rs.next()){
+            
+        Map<String, String> resultSet
+                = new HashMap<String, String>();
+
+            String username= rs.getString("user");
+                    resultSet.put("user", username);
+                    resultSet.put("Name", rs.getString("Nombre"));
+                    resultSet.put("LastName", rs.getString("Apellido"));
+                    resultSet.put("BirthDay", rs.getString("Fecha_nacimiento"));
+                    resultSet.put("email", rs.getString("email"));
+                    resultSet.put("SignInD", rs.getString("Fecha_ingreso"));
+                    resultSet.put("Type", rs.getString("Tipo"));
+                    resultSet.put("CName", rs.getString("SNombre"));
+                    resultSet.put("CLastName", rs.getString("SApellido"));
+                    
+                    tabla.put( username,resultSet);
+                    
+            
+        }
+
+        stmt.close();
+
+        con.close();
+        return tabla;
+    }
+
+    
     public boolean studentExists(String stud) throws SQLException, ClassNotFoundException {
         Class.forName("org.postgresql.Driver");
 
